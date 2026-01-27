@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Ticket, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
+// Force rebuild 2026-01-27
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
