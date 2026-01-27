@@ -53,6 +53,11 @@ model User {
   // Notifications
   notifications     Notification[]
 
+  // Asset relations
+  assignedAssets            Asset[]           @relation("AssetUser")
+  assetAssignments          AssetAssignment[]
+  performedAssetAssignments AssetAssignment[] @relation("AssetAssigner")
+
   @@map("users")
 }
 
@@ -113,6 +118,7 @@ model Department {
   tickets     Ticket[]
   slaPolicies SLAPolicy[]
   cannedResponses CannedResponse[]
+  assets      Asset[]
 
   @@map("departments")
 }
@@ -197,6 +203,7 @@ model Ticket {
   events          TicketEvent[]
   tags            TicketTag[]
   slaTracking     SLATracking?
+  assets          TicketAsset[]
 
   @@index([status])
   @@index([priority])
@@ -520,4 +527,81 @@ model SystemSetting {
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
   @@map("system_settings")
+}
+
+// =============================================
+// ASSET MANAGEMENT
+// =============================================
+
+model AssetModel {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  manufacturer String?
+  category    String   // Laptop, Phone, Software, Monitor, etc.
+  image       String?
+  specs       String?  // JSON specs
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  assets      Asset[]
+
+  @@map("asset_models")
+}
+
+model Asset {
+  id            Int       @id @default(autoincrement())
+  assetTag      String    @unique @map("asset_tag") // Company Tag
+  serialNumber  String?   @map("serial_number")
+  status        String    @default("STOCK") // STOCK, ASSIGNED, MAINTENANCE, RETIRED, LOST
+  purchaseDate  DateTime? @map("purchase_date")
+  warrantyEnd   DateTime? @map("warranty_end")
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  modelId       Int       @map("model_id")
+  model         AssetModel @relation(fields: [modelId], references: [id])
+  
+  assignedToId  Int?      @map("assigned_to_id")
+  assignedTo    User?     @relation("AssetUser", fields: [assignedToId], references: [id])
+
+  departmentId  Int?      @map("department_id")
+  department    Department? @relation(fields: [departmentId], references: [id])
+
+  assignments   AssetAssignment[]
+  tickets       TicketAsset[]
+
+  @@map("assets")
+}
+
+model AssetAssignment {
+  id          Int       @id @default(autoincrement())
+  assignedAt  DateTime  @default(now()) @map("assigned_at")
+  returnedAt  DateTime? @map("returned_at")
+  notes       String?
+
+  // Relations
+  assetId     Int       @map("asset_id")
+  asset       Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  
+  assignedById Int      @map("assigned_by_id")
+  assignedBy  User      @relation("AssetAssigner", fields: [assignedById], references: [id])
+
+  @@map("asset_assignments")
+}
+
+model TicketAsset {
+  ticketId    Int       @map("ticket_id")
+  assetId     Int       @map("asset_id")
+
+  ticket      Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  asset       Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@id([ticketId, assetId])
+  @@map("ticket_assets")
 }

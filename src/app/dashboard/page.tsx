@@ -30,12 +30,6 @@ interface RecentTicket {
   requester: { name: string };
 }
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Günaydın';
-  if (hour < 18) return 'İyi günler';
-  return 'İyi akşamlar';
-}
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -151,8 +145,8 @@ export default function DashboardPage() {
     <div className="dashboard">
       <div className="page-header">
         <div>
-          <h1>{getGreeting()}, {session?.user?.name?.split(' ')[0]}! 👋</h1>
-          <p>İşte destek sisteminin güncel durumu</p>
+          <h1>Merhaba, {session?.user?.name || 'Kullanıcı'}</h1>
+          <p>Malhotra Helpdesk paneline hoş geldiniz</p>
         </div>
         <Link href="/dashboard/tickets/new" className="btn btn-primary">
           <Ticket size={18} />

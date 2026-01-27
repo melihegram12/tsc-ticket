@@ -21,6 +21,7 @@ import {
   Bell,
   ChevronDown,
   BookOpen,
+  Package,
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
 import NotificationCenter from '@/components/NotificationCenter';
@@ -38,6 +39,7 @@ const navItems: NavItem[] = [
   { label: 'Talepler', href: '/dashboard/tickets', icon: <List size={20} /> },
   { label: 'Canlı Destek', href: '/dashboard/chat', icon: <MessageSquare size={20} /> },
   { label: 'Bilgi Bankası', href: '/dashboard/kb', icon: <BookOpen size={20} /> },
+  { label: 'Varlıklar', href: '/dashboard/assets', icon: <Package size={20} /> },
 ];
 
 const adminItems: NavItem[] = [
