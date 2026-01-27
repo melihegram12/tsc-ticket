@@ -4,13 +4,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: any) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
+    const { id } = paramsObj || {};
+
     try {
         const asset = await prisma.asset.findUnique({
-            where: { id: parseInt(params.id) },
+            where: { id: parseInt(id) },
             include: {
                 model: true,
                 assignedTo: {
@@ -42,24 +45,22 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: any) {
     const session = await getServerSession(authOptions);
     if (!session || (session.user.role !== 'Admin' && session.user.role !== 'Agent')) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
+    const { id } = paramsObj || {};
+
     try {
         const data = await req.json();
-        const assetId = parseInt(params.id);
-
-        // Handle Assignment Change Logic
-        // If assignedToId changed, we should create a record in AssetAssignment
-        // This is complex, so for MVP we might just update the field, but let's try to be smart.
+        const assetId = parseInt(id);
 
         const existingAsset = await prisma.asset.findUnique({ where: { id: assetId } });
 
         if (data.assignedToId && data.assignedToId !== existingAsset?.assignedToId) {
-            // Create assignment history
             await prisma.assetAssignment.create({
                 data: {
                     assetId: assetId,
@@ -68,9 +69,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
                     notes: 'Assigned via update'
                 }
             });
-
-            // Mark previous assignment as returned? 
-            // Real logic is harder, let's keep it simple for now and just log the new assignment.
         }
 
         const asset = await prisma.asset.update({
@@ -91,16 +89,20 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: any) {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'Admin') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
+    const { id } = paramsObj || {};
+
     try {
-        await prisma.asset.delete({ where: { id: parseInt(params.id) } });
+        await prisma.asset.delete({ where: { id: parseInt(id) } });
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete asset' }, { status: 500 });
     }
 }
+

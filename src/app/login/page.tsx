@@ -10,8 +10,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
-  // Default to Personnel (Password-less) view
-  const [password, setPassword] = useState('SKIP_PASSWORD_CHECK_FOR_REQUESTER');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +24,7 @@ function LoginForm() {
 
     try {
       const result = await signIn('credentials', {
-        email: password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'calisan@tsc.local' : email,
+        email,
         password,
         redirect: false,
       });
@@ -86,28 +85,6 @@ function LoginForm() {
               <p>Devam etmek için giriş yapın</p>
             </div>
 
-            {/* Login Type Tabs */}
-            <div className="login-tabs">
-              <button
-                className={`login-tab ${password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
-                onClick={() => {
-                  setPassword('');
-                  setError('');
-                }}
-              >
-                Yönetici / Destek
-              </button>
-              <button
-                className={`login-tab ${password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
-                onClick={() => {
-                  setPassword('SKIP_PASSWORD_CHECK_FOR_REQUESTER');
-                  setError('');
-                }}
-              >
-                Personel (Hızlı Giriş)
-              </button>
-            </div>
-
             {error && (
               <div className="error-alert">
                 <AlertCircle size={18} />
@@ -116,68 +93,56 @@ function LoginForm() {
             )}
 
             <form onSubmit={handleSubmit} className="login-form">
-              {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="form-group">
-                  <label htmlFor="email">E-posta</label>
-                  <div className="input-wrapper">
-                    <Mail size={18} className="input-icon" />
-                    <input
-                      id="email"
-                      type="email"
-                      className="input"
-                      placeholder="ornek@sirket.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      autoComplete="email"
-                    />
-                  </div>
+              <div className="form-group">
+                <label htmlFor="email">E-posta</label>
+                <div className="input-wrapper">
+                  <Mail size={18} className="input-icon" />
+                  <input
+                    id="email"
+                    type="email"
+                    className="input"
+                    placeholder="ornek@sirket.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                  />
                 </div>
-              )}
+              </div>
 
-              {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="form-group">
-                  <div className="flex justify-between items-center mb-1">
-                    <label htmlFor="password">Şifre</label>
-                  </div>
-                  <div className="input-wrapper">
-                    <Lock size={18} className="input-icon" />
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      className="input"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-1">
+                  <label htmlFor="password">Şifre</label>
                 </div>
-              )}
-
-              {password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="info-alert">
-                  <span>Personel girişi için bilgilerinize gerek yoktur. Direkt giriş yapabilirsiniz.</span>
+                <div className="input-wrapper">
+                  <Lock size={18} className="input-icon" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="input"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
-              )}
+              </div>
 
               <div className="form-options">
                 <label className="checkbox-label">
                   <input type="checkbox" />
                   <span>Beni hatırla</span>
                 </label>
-                {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                  <a href="#" className="forgot-link">Şifremi unuttum</a>
-                )}
+                <a href="#" className="forgot-link">Şifremi unuttum</a>
               </div>
 
               <button
@@ -324,33 +289,6 @@ function LoginForm() {
           margin: 0;
         }
 
-        .login-tabs {
-          display: flex;
-          background: var(--gray-100);
-          padding: 0.25rem;
-          border-radius: 0.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .login-tab {
-          flex: 1;
-          padding: 0.5rem;
-          border: none;
-          background: transparent;
-          color: var(--gray-600);
-          font-weight: 500;
-          font-size: 0.875rem;
-          border-radius: 0.25rem;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .login-tab.active {
-          background: white;
-          color: var(--primary-600);
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
         .error-alert {
           display: flex;
           align-items: center;
@@ -361,17 +299,6 @@ function LoginForm() {
           border-radius: 0.5rem;
           margin-bottom: 1.5rem;
           font-size: 0.875rem;
-        }
-
-        .info-alert {
-          padding: 0.75rem 1rem;
-          background: var(--primary-50);
-          color: var(--primary-700);
-          border-radius: 0.5rem;
-          margin-bottom: 1rem;
-          font-size: 0.875rem;
-          text-align: center;
-          border: 1px solid var(--primary-100);
         }
 
         .login-form {
