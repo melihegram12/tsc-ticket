@@ -29,8 +29,7 @@ export default function NewTicketPage() {
         requesterName: '',
         subject: '',
         description: '',
-        departmentId: '',
-        categoryId: '',
+        department: '',
         priority: 'NORMAL',
     });
     const [attachments, setAttachments] = useState<any[]>([]);
@@ -51,7 +50,7 @@ export default function NewTicketPage() {
         fetchDepartments();
     }, []);
 
-    const selectedDepartment = departments.find(d => d.id === parseInt(formData.departmentId));
+    // const selectedDepartment = departments.find(d => d.id === parseInt(formData.departmentId));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -66,8 +65,7 @@ export default function NewTicketPage() {
                     requesterName: formData.requesterName,
                     subject: formData.subject,
                     description: formData.description,
-                    departmentId: parseInt(formData.departmentId),
-                    categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+                    department: formData.department,
                     priority: formData.priority,
                     attachments: attachments,
                 }),
@@ -150,42 +148,18 @@ export default function NewTicketPage() {
                     <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="department">Departman *</label>
-                            <select
+                            <input
                                 id="department"
+                                type="text"
                                 className="input"
-                                value={formData.departmentId}
+                                placeholder="Departman adını girin (örn: Bilgi İşlem)"
+                                value={formData.department}
                                 onChange={(e) => setFormData({
                                     ...formData,
-                                    departmentId: e.target.value,
-                                    categoryId: ''
+                                    department: e.target.value
                                 })}
                                 required
-                            >
-                                <option value="">Departman Seçin</option>
-                                {departments.map((dept) => (
-                                    <option key={dept.id} value={dept.id}>
-                                        {dept.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="category">Kategori</label>
-                            <select
-                                id="category"
-                                className="input"
-                                value={formData.categoryId}
-                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                disabled={!selectedDepartment}
-                            >
-                                <option value="">Kategori Seçin</option>
-                                {selectedDepartment?.categories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
 
                         <div className="form-group">

@@ -176,17 +176,32 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { requesterName, subject, description, departmentId, categoryId, priority = 'NORMAL' } = body;
+        // department is now a string name
+        const { requesterName, subject, description, department, priority = 'NORMAL' } = body;
 
-        if (!requesterName || !subject || !description || !departmentId) {
+        if (!requesterName || !subject || !description || !department) {
             return NextResponse.json(
                 { error: 'Ad soyad, konu, açıklama ve departman zorunludur' },
                 { status: 400 }
             );
         }
 
+        // Find or create department
+        let departmentObj = await prisma.department.findFirst({
+            where: { name: department }
+        });
+
+        if (!departmentObj) {
+            departmentObj = await prisma.department.create({
+                data: {
+                    name: department,
+                    description: 'Otomatik oluşturulan departman',
+                }
+            });
+        }
+
         const ticketNumber = await generateTicketNumber();
-        const slaDates = await calculateSLADates(departmentId, priority);
+        const slaDates = await calculateSLADates(departmentObj.id, priority);
 
         const ticket = await prisma.ticket.create({
             data: {
@@ -196,8 +211,8 @@ export async function POST(request: NextRequest) {
                 description,
                 priority,
                 requesterId: parseInt(session.user.id),
-                departmentId,
-                categoryId: categoryId || null,
+                departmentId: departmentObj.id,
+                categoryId: null,
                 slaTracking: slaDates
                     ? {
                         create: slaDates,
@@ -207,7 +222,7 @@ export async function POST(request: NextRequest) {
                     create: {
                         eventType: 'CREATED',
                         actorId: parseInt(session.user.id),
-                        newValue: JSON.stringify({ subject, priority, departmentId }),
+                        newValue: JSON.stringify({ subject, priority, departmentId: departmentObj.id }),
                     },
                 },
                 attachments: body.attachments?.length ? {
@@ -239,7 +254,7 @@ export async function POST(request: NextRequest) {
             ticket.id,
             ticket.ticketNumber,
             ticket.subject,
-            departmentId,
+            departmentObj.id,
             priority
         ).catch(err => {
             console.error('Notification error:', err);

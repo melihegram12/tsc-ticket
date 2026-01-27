@@ -353,7 +353,7 @@ async function main() {
     update: {},
     create: {
       email: 'calisan@tsc.local',
-      name: 'Test Çalışan',
+      name: 'Malhotra Personel',
       passwordHash,
       roleId: requesterRole.id,
     },
@@ -495,11 +495,11 @@ Windows şifrenizi unuttuysanız aşağıdaki adımları izleyin:
   console.log('✅ System settings created');
 
   console.log('\n🎉 Database seeding completed!');
-  console.log('\n📋 Test Users:');
+  console.log('\n📋 Kullanıcılar:');
   console.log('   Admin: admin@tsc.local / admin123');
   console.log('   IT Agent: it.agent@tsc.local / admin123');
   console.log('   HR Agent: hr.agent@tsc.local / admin123');
-  console.log('   Çalışan: calisan@tsc.local / admin123');
+  console.log('   Personel: calisan@tsc.local (şifresiz giriş)');
 }
 
 main()

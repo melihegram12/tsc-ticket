@@ -145,7 +145,7 @@ export default function DashboardPage() {
     <div className="dashboard">
       <div className="page-header">
         <div>
-          <h1>Merhaba, {session?.user?.name || 'Kullanıcı'}</h1>
+          <h1>İyi günler</h1>
           <p>Malhotra Helpdesk paneline hoş geldiniz</p>
         </div>
         <Link href="/dashboard/tickets/new" className="btn btn-primary">
