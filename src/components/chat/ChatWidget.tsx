@@ -313,8 +313,8 @@ export default function ChatWidget() {
                                 </div>
                             ) : messages.length === 0 ? (
                                 <div className="welcome-message">
-                                    <p>👋 Merhaba! Size nasıl yardımcı olabiliriz?</p>
-                                    <p className="sub">Mesajınızı yazın, en kısa sürede yanıtlayacağız.</p>
+                                    <p>Size nasıl yardımcı olabiliriz?</p>
+                                    <p className="sub">Mesajınızı yazın, destek ekibimiz en kısa sürede yanıtlayacaktır.</p>
                                 </div>
                             ) : (
                                 messages.map((msg) => (
