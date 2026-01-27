@@ -1,0 +1,233 @@
+﻿Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" "C:
+\Program Files\nodejs
+/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (:String   
+ ) [], RemoteExce    
+ption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Error: Prisma schema 
+validation - (validat
+e wasm)
+Error code: P1012
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `T
+icketStatus`. But the
+ current connector do
+es not support enums.
+[0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:155[0m
+[1;94m   | [0m
+[1;94m154 | [0m
+[1;94m155 | [0m[1;
+91menum TicketStatus 
+{[0m
+[1;94m156 | [0m  NE
+W
+[1;94m157 | [0m  OP
+EN
+[1;94m158 | [0m  WA
+ITING_REQUESTER
+[1;94m159 | [0m  PE
+NDING
+[1;94m160 | [0m  RE
+SOLVED
+[1;94m161 | [0m  CL
+OSED
+[1;94m162 | [0m  RE
+OPENED
+[1;94m163 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `T
+icketPriority`. But t
+he current connector 
+does not support enum
+s.[0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:165[0m
+[1;94m   | [0m
+[1;94m164 | [0m
+[1;94m165 | [0m[1;
+91menum TicketPriorit
+y {[0m
+[1;94m166 | [0m  LO
+W
+[1;94m167 | [0m  NO
+RMAL
+[1;94m168 | [0m  HI
+GH
+[1;94m169 | [0m  UR
+GENT
+[1;94m170 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `T
+icketSource`. But the
+ current connector do
+es not support enums.
+[0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:172[0m
+[1;94m   | [0m
+[1;94m171 | [0m
+[1;94m172 | [0m[1;
+91menum TicketSource 
+{[0m
+[1;94m173 | [0m  WE
+B
+[1;94m174 | [0m  EM
+AIL
+[1;94m175 | [0m  AP
+I
+[1;94m176 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `M
+essageType`. But the 
+current connector doe
+s not support enums.
+[0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:228[0m
+[1;94m   | [0m
+[1;94m227 | [0m
+[1;94m228 | [0m[1;
+91menum MessageType {
+[0m
+[1;94m229 | [0m  PU
+BLIC_REPLY
+[1;94m230 | [0m  IN
+TERNAL_NOTE
+[1;94m231 | [0m  SY
+STEM
+[1;94m232 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `E
+ventType`. But the cu
+rrent connector does 
+not support enums.[0
+m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:275[0m
+[1;94m   | [0m
+[1;94m274 | [0m
+[1;94m275 | [0m[1;
+91menum EventType {[
+0m
+[1;94m276 | [0m  CR
+EATED
+[1;94m277 | [0m  ST
+ATUS_CHANGED
+[1;94m278 | [0m  PR
+IORITY_CHANGED
+[1;94m279 | [0m  AS
+SIGNED
+[1;94m280 | [0m  UN
+ASSIGNED
+[1;94m281 | [0m  CA
+TEGORY_CHANGED
+[1;94m282 | [0m  DE
+PARTMENT_CHANGED
+[1;94m283 | [0m  TA
+G_ADDED
+[1;94m284 | [0m  TA
+G_REMOVED
+[1;94m285 | [0m  ME
+SSAGE_ADDED
+[1;94m286 | [0m  AT
+TACHMENT_ADDED
+[1;94m287 | [0m  SL
+A_BREACHED
+[1;94m288 | [0m  RE
+OPENED
+[1;94m289 | [0m  ME
+RGED
+[1;94m290 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `C
+hatStatus`. But the c
+urrent connector does
+ not support enums.[
+0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:456[0m
+[1;94m   | [0m
+[1;94m455 | [0m
+[1;94m456 | [0m[1;
+91menum ChatStatus {
+[0m
+[1;94m457 | [0m  WA
+ITING
+[1;94m458 | [0m  AC
+TIVE
+[1;94m459 | [0m  CL
+OSED
+[1;94m460 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1
+mError validating: Yo
+u defined the enum `N
+otificationType`. But
+ the current connecto
+r does not support en
+ums.[0m
+  [1;94m-->[0m  [4
+mprisma\schema.prisma
+:503[0m
+[1;94m   | [0m
+[1;94m502 | [0m
+[1;94m503 | [0m[1;
+91menum NotificationT
+ype {[0m
+[1;94m504 | [0m  TI
+CKET_CREATED
+[1;94m505 | [0m  TI
+CKET_ASSIGNED
+[1;94m506 | [0m  TI
+CKET_UPDATED
+[1;94m507 | [0m  TI
+CKET_REPLIED
+[1;94m508 | [0m  SL
+A_WARNING
+[1;94m509 | [0m  SL
+A_BREACH
+[1;94m510 | [0m  CH
+AT_MESSAGE
+[1;94m511 | [0m}
+[1;94m   | [0m
+
+Validation Error Coun
+t: 7
+[Context: validate]
+
+Prisma CLI Version : 
+5.22.0

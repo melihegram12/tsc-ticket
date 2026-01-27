@@ -1,0 +1,523 @@
+// TSC - Ticket Support Center Database Schema
+// HESK-like helpdesk system
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// USER & AUTHENTICATION
+// =============================================
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  name          String
+  passwordHash  String?   @map("password_hash")
+  avatarUrl     String?   @map("avatar_url")
+  isActive      Boolean   @default(true) @map("is_active")
+  locale        String    @default("tr")
+  timezone      String    @default("Europe/Istanbul")
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  roleId        Int       @map("role_id")
+  role          Role      @relation(fields: [roleId], references: [id])
+  
+  departments   UserDepartment[]
+  
+  // Ticket relations
+  createdTickets    Ticket[]        @relation("TicketCreator")
+  assignedTickets   Ticket[]        @relation("TicketAssignee")
+  ticketMessages    TicketMessage[]
+  ticketEvents      TicketEvent[]
+  uploadedAttachments TicketAttachment[]
+  
+  // Chat relations
+  customerChats     ChatSession[]   @relation("ChatCustomer")
+  agentChats        ChatSession[]   @relation("ChatAgent")
+  chatMessages      ChatMessage[]
+  
+  // KB relations
+  createdArticles   KBArticle[]     @relation("ArticleCreator")
+  updatedArticles   KBArticle[]     @relation("ArticleUpdater")
+  createdCannedResponses CannedResponse[]
+
+  // Notifications
+  notifications     Notification[]
+
+  @@map("users")
+}
+
+model Role {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  isSystem    Boolean   @default(false) @map("is_system")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique
+  name        String
+  description String?
+  category    String    // ticket, kb, admin, report
+  
+  // Relations
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+  
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// =============================================
+// DEPARTMENTS & CATEGORIES
+// =============================================
+
+model Department {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  emailAlias  String?   @unique @map("email_alias")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  users       UserDepartment[]
+  categories  Category[]
+  tickets     Ticket[]
+  slaPolicies SLAPolicy[]
+  cannedResponses CannedResponse[]
+
+  @@map("departments")
+}
+
+model UserDepartment {
+  userId       Int      @map("user_id")
+  departmentId Int      @map("department_id")
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, departmentId])
+  @@map("user_departments")
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  parentId     Int?      @map("parent_id")
+  departmentId Int       @map("department_id")
+  isActive     Boolean   @default(true) @map("is_active")
+  sortOrder    Int       @default(0) @map("sort_order")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  department  Department @relation(fields: [departmentId], references: [id])
+  tickets     Ticket[]
+
+  @@map("categories")
+}
+
+// =============================================
+// TICKETS (String fields instead of enums for SQLite)
+// =============================================
+
+// TicketStatus: NEW, OPEN, WAITING_REQUESTER, PENDING, RESOLVED, CLOSED, REOPENED
+// TicketPriority: LOW, NORMAL, HIGH, URGENT
+// TicketSource: WEB, EMAIL, API
+
+model Ticket {
+  id              Int       @id @default(autoincrement())
+  ticketNumber    String    @unique @map("ticket_number")
+  requesterName   String?   @map("requester_name") // Name entered by requester when creating ticket
+  subject         String
+  description     String
+  status          String    @default("NEW")    // NEW, OPEN, WAITING_REQUESTER, PENDING, RESOLVED, CLOSED, REOPENED
+  priority        String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  source          String    @default("WEB")    // WEB, EMAIL, API
+  isPrivate       Boolean   @default(false) @map("is_private")
+  
+  // Timestamps
+  lastActivityAt  DateTime  @default(now()) @map("last_activity_at")
+  firstResponseAt DateTime? @map("first_response_at")
+  resolvedAt      DateTime? @map("resolved_at")
+  closedAt        DateTime? @map("closed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  // Satisfaction
+  satisfactionScore   Int?    @map("satisfaction_score")
+  satisfactionComment String? @map("satisfaction_comment")
+
+  // Relations
+  requesterId     Int       @map("requester_id")
+  requester       User      @relation("TicketCreator", fields: [requesterId], references: [id])
+  
+  assignedToId    Int?      @map("assigned_to_id")
+  assignedTo      User?     @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  
+  departmentId    Int       @map("department_id")
+  department      Department @relation(fields: [departmentId], references: [id])
+  
+  categoryId      Int?      @map("category_id")
+  category        Category? @relation(fields: [categoryId], references: [id])
+  
+  messages        TicketMessage[]
+  attachments     TicketAttachment[]
+  events          TicketEvent[]
+  tags            TicketTag[]
+  slaTracking     SLATracking?
+
+  @@index([status])
+  @@index([priority])
+  @@index([departmentId])
+  @@index([requesterId])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+// MessageType: PUBLIC_REPLY, INTERNAL_NOTE, SYSTEM
+
+model TicketMessage {
+  id          Int       @id @default(autoincrement())
+  body        String
+  messageType String    @default("PUBLIC_REPLY") @map("message_type") // PUBLIC_REPLY, INTERNAL_NOTE, SYSTEM
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  ticketId    Int       @map("ticket_id")
+  ticket      Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  authorId    Int       @map("author_id")
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  attachments TicketAttachment[]
+
+  @@index([ticketId])
+  @@map("ticket_messages")
+}
+
+model TicketAttachment {
+  id          Int       @id @default(autoincrement())
+  fileName    String    @map("file_name")
+  mimeType    String    @map("mime_type")
+  sizeBytes   Int       @map("size_bytes")
+  storagePath String    @map("storage_path")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  ticketId    Int       @map("ticket_id")
+  ticket      Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  messageId   Int?      @map("message_id")
+  message     TicketMessage? @relation(fields: [messageId], references: [id])
+  
+  uploadedById Int      @map("uploaded_by_id")
+  uploadedBy  User      @relation(fields: [uploadedById], references: [id])
+
+  @@index([ticketId])
+  @@map("ticket_attachments")
+}
+
+// EventType: CREATED, STATUS_CHANGED, PRIORITY_CHANGED, ASSIGNED, UNASSIGNED, 
+//            CATEGORY_CHANGED, DEPARTMENT_CHANGED, TAG_ADDED, TAG_REMOVED,
+//            MESSAGE_ADDED, ATTACHMENT_ADDED, SLA_BREACHED, REOPENED, MERGED
+
+model TicketEvent {
+  id          Int       @id @default(autoincrement())
+  eventType   String    @map("event_type") // See comment above for values
+  oldValue    String?   @map("old_value")
+  newValue    String?   @map("new_value")
+  metadata    String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  ticketId    Int       @map("ticket_id")
+  ticket      Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  actorId     Int?      @map("actor_id")
+  actor       User?     @relation(fields: [actorId], references: [id])
+
+  @@index([ticketId])
+  @@index([eventType])
+  @@map("ticket_events")
+}
+
+model Tag {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  color     String      @default("#6366f1")
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  tickets   TicketTag[]
+
+  @@map("tags")
+}
+
+model TicketTag {
+  ticketId  Int @map("ticket_id")
+  tagId     Int @map("tag_id")
+  
+  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  tag       Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([ticketId, tagId])
+  @@map("ticket_tags")
+}
+
+// =============================================
+// SLA & AUTOMATION
+// =============================================
+
+model SLAPolicy {
+  id                    Int       @id @default(autoincrement())
+  name                  String
+  priority              String    // LOW, NORMAL, HIGH, URGENT
+  firstResponseMinutes  Int       @map("first_response_minutes")
+  resolutionMinutes     Int       @map("resolution_minutes")
+  isActive              Boolean   @default(true) @map("is_active")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  departmentId          Int       @map("department_id")
+  department            Department @relation(fields: [departmentId], references: [id])
+
+  @@unique([departmentId, priority])
+  @@map("sla_policies")
+}
+
+model SLATracking {
+  id                      Int       @id @default(autoincrement())
+  firstResponseDueAt      DateTime  @map("first_response_due_at")
+  resolutionDueAt         DateTime  @map("resolution_due_at")
+  firstResponseBreachedAt DateTime? @map("first_response_breached_at")
+  resolutionBreachedAt    DateTime? @map("resolution_breached_at")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  ticketId                Int       @unique @map("ticket_id")
+  ticket                  Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("sla_tracking")
+}
+
+model AutomationRule {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  conditions  String    // JSON
+  actions     String    // JSON
+  isActive    Boolean   @default(true) @map("is_active")
+  priority    Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("automation_rules")
+}
+
+// =============================================
+// KNOWLEDGE BASE
+// =============================================
+
+model KBCategory {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  parentId    Int?      @map("parent_id")
+  sortOrder   Int       @default(0) @map("sort_order")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  parent      KBCategory?  @relation("KBCategoryHierarchy", fields: [parentId], references: [id])
+  children    KBCategory[] @relation("KBCategoryHierarchy")
+  articles    KBArticle[]
+
+  @@map("kb_categories")
+}
+
+model KBArticle {
+  id            Int       @id @default(autoincrement())
+  title         String
+  body          String
+  excerpt       String?
+  isPublished   Boolean   @default(false) @map("is_published")
+  viewCount     Int       @default(0) @map("view_count")
+  helpfulCount  Int       @default(0) @map("helpful_count")
+  notHelpfulCount Int     @default(0) @map("not_helpful_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  categoryId    Int       @map("category_id")
+  category      KBCategory @relation(fields: [categoryId], references: [id])
+  
+  createdById   Int       @map("created_by_id")
+  createdBy     User      @relation("ArticleCreator", fields: [createdById], references: [id])
+  
+  updatedById   Int       @map("updated_by_id")
+  updatedBy     User      @relation("ArticleUpdater", fields: [updatedById], references: [id])
+
+  @@index([isPublished])
+  @@map("kb_articles")
+}
+
+model CannedResponse {
+  id          Int       @id @default(autoincrement())
+  title       String
+  body        String
+  shortcut    String?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  departmentId Int?     @map("department_id")
+  department  Department? @relation(fields: [departmentId], references: [id])
+  
+  createdById Int       @map("created_by_id")
+  createdBy   User      @relation(fields: [createdById], references: [id])
+
+  @@map("canned_responses")
+}
+
+// =============================================
+// LIVE CHAT
+// =============================================
+
+// ChatStatus: WAITING, ACTIVE, CLOSED
+
+model ChatSession {
+  id          Int       @id @default(autoincrement())
+  status      String    @default("WAITING") // WAITING, ACTIVE, CLOSED
+  subject     String?
+  startedAt   DateTime  @default(now()) @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+
+  // Relations
+  customerId  Int       @map("customer_id")
+  customer    User      @relation("ChatCustomer", fields: [customerId], references: [id])
+  
+  agentId     Int?      @map("agent_id")
+  agent       User?     @relation("ChatAgent", fields: [agentId], references: [id])
+  
+  messages    ChatMessage[]
+
+  @@index([status])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id          Int       @id @default(autoincrement())
+  message     String
+  isRead      Boolean   @default(false) @map("is_read")
+  sentAt      DateTime  @default(now()) @map("sent_at")
+
+  // Relations
+  sessionId   Int       @map("session_id")
+  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  senderId    Int       @map("sender_id")
+  sender      User      @relation(fields: [senderId], references: [id])
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}
+
+// =============================================
+// NOTIFICATIONS
+// =============================================
+
+// NotificationType: TICKET_CREATED, TICKET_ASSIGNED, TICKET_UPDATED, 
+//                   TICKET_REPLIED, SLA_WARNING, SLA_BREACH, CHAT_MESSAGE
+
+model Notification {
+  id          Int       @id @default(autoincrement())
+  type        String    // See comment above for values
+  title       String
+  message     String
+  isRead      Boolean   @default(false) @map("is_read")
+  data        String?   // JSON metadata
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// =============================================
+// EMAIL CONFIGURATION
+// =============================================
+
+model EmailConfig {
+  id              Int       @id @default(autoincrement())
+  name            String
+  imapHost        String?   @map("imap_host")
+  imapPort        Int?      @map("imap_port")
+  imapUser        String?   @map("imap_user")
+  imapPassword    String?   @map("imap_password")
+  imapSecure      Boolean   @default(true) @map("imap_secure")
+  smtpHost        String?   @map("smtp_host")
+  smtpPort        Int?      @map("smtp_port")
+  smtpUser        String?   @map("smtp_user")
+  smtpPassword    String?   @map("smtp_password")
+  smtpSecure      Boolean   @default(true) @map("smtp_secure")
+  fromEmail       String    @map("from_email")
+  fromName        String    @map("from_name")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("email_configs")
+}
+
+// =============================================
+// SYSTEM SETTINGS
+// =============================================
+
+model SystemSetting {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique
+  value       String
+  type        String    @default("string")  // string, number, boolean, json
+  description String?
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
