@@ -477,7 +477,7 @@ Windows şifrenizi unuttuysanız aşağıdaki adımları izleyin:
   // SYSTEM SETTINGS
   // =============================================
   const settings = [
-    { key: 'app.name', value: 'TSC Helpdesk', type: 'string', description: 'Uygulama adı' },
+    { key: 'app.name', value: 'Malhotra Helpdesk', type: 'string', description: 'Uygulama adı' },
     { key: 'app.logo', value: '/logo.png', type: 'string', description: 'Logo dosya yolu' },
     { key: 'ticket.prefix', value: 'TCK', type: 'string', description: 'Ticket numara öneki' },
     { key: 'ticket.autoclose.days', value: '7', type: 'number', description: 'Çözülen ticketların otomatik kapanma süresi (gün)' },

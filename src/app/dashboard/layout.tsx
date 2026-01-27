@@ -135,7 +135,7 @@ export default function DashboardLayout({
             <div className="logo-icon">
               <Ticket size={24} />
             </div>
-            <span className="logo-text">TSC Helpdesk</span>
+            <span className="logo-text">Malhotra Helpdesk</span>
           </Link>
           <button
             className="close-btn"

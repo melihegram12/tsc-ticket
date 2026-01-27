@@ -7,7 +7,7 @@ import { Providers } from '@/components/providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'TSC Helpdesk - Şirket İçi Destek Sistemi',
+  title: 'Malhotra Helpdesk - Şirket İçi Destek Sistemi',
   description: 'HESK benzeri şirket içi ticket yönetim sistemi',
 };
 

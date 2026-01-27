@@ -20,7 +20,7 @@ const defaultConfig: EmailConfig = {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
     fromEmail: process.env.SMTP_FROM_EMAIL || 'noreply@example.com',
-    fromName: process.env.SMTP_FROM_NAME || 'TSC Helpdesk',
+    fromName: process.env.SMTP_FROM_NAME || 'Malhotra Helpdesk',
 };
 
 // Get config from database or use defaults
@@ -127,12 +127,12 @@ function wrapTemplate(content: string, title: string): string {
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="logo">🎫 TSC Helpdesk</div>
+                <div class="logo">🎫 Malhotra Helpdesk</div>
             </div>
             ${content}
         </div>
         <div class="footer">
-            Bu e-posta TSC Helpdesk sistemi tarafından otomatik olarak gönderilmiştir.
+            Bu e-posta Malhotra Helpdesk sistemi tarafından otomatik olarak gönderilmiştir.
         </div>
     </div>
 </body>

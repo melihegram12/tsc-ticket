@@ -51,7 +51,7 @@ function LoginForm() {
               <div className="logo-icon">
                 <Ticket size={40} />
               </div>
-              <h1>TSC Helpdesk</h1>
+              <h1>Malhotra Helpdesk</h1>
             </div>
             <p className="tagline">Şirket İçi Destek Sistemi</p>
             <div className="features">
