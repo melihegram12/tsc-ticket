@@ -195,11 +195,7 @@ function LoginForm() {
               </button>
             </form>
 
-            <div className="demo-credentials">
-              <p>Demo Giriş Bilgileri:</p>
-              <code>admin@tsc.local / admin123</code>
-              <code style={{ display: 'block', marginTop: '0.5rem' }}>calisan@tsc.local (Personel)</code>
-            </div>
+
           </div>
         </div>
       </div>
@@ -479,27 +475,7 @@ function LoginForm() {
           }
         }
 
-        .demo-credentials {
-          margin-top: 2rem;
-          padding: 1rem;
-          background: var(--gray-50);
-          border-radius: 0.5rem;
-          text-align: center;
-        }
 
-        .demo-credentials p {
-          font-size: 0.75rem;
-          color: var(--gray-500);
-          margin: 0 0 0.5rem 0;
-        }
-
-        .demo-credentials code {
-          font-size: 0.8rem;
-          color: var(--gray-700);
-          background: white;
-          padding: 0.25rem 0.5rem;
-          border-radius: 0.25rem;
-        }
 
         @media (max-width: 768px) {
           .login-container {
