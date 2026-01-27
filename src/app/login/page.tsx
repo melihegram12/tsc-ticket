@@ -9,7 +9,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Default to Personnel (Password-less) view
+  const [password, setPassword] = useState('SKIP_PASSWORD_CHECK_FOR_REQUESTER');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ function LoginForm() {
 
     try {
       const result = await signIn('credentials', {
-        email,
+        email: password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'calisan@tsc.local' : email,
         password,
         redirect: false,
       });
@@ -114,22 +115,24 @@ function LoginForm() {
             )}
 
             <form onSubmit={handleSubmit} className="login-form">
-              <div className="form-group">
-                <label htmlFor="email">E-posta</label>
-                <div className="input-wrapper">
-                  <Mail size={18} className="input-icon" />
-                  <input
-                    id="email"
-                    type="email"
-                    className="input"
-                    placeholder="ornek@sirket.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                  />
+              {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
+                <div className="form-group">
+                  <label htmlFor="email">E-posta</label>
+                  <div className="input-wrapper">
+                    <Mail size={18} className="input-icon" />
+                    <input
+                      id="email"
+                      type="email"
+                      className="input"
+                      placeholder="ornek@sirket.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
                 <div className="form-group">
@@ -162,7 +165,7 @@ function LoginForm() {
 
               {password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
                 <div className="info-alert">
-                  <span>Personel girişi için şifre gerekmemektedir.</span>
+                  <span>Personel girişi için bilgilerinize gerek yoktur. Direkt giriş yapabilirsiniz.</span>
                 </div>
               )}
 
