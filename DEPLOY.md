@@ -1,52 +1,46 @@
-# Railway Deployment Rehberi 🚀
+# Vercel Deployment Rehberi 🚀
 
-## Adım 1: GitHub'a Push
+## Adım 1: Neon PostgreSQL Kurulumu
 
-```bash
-# Git repo oluştur (yoksa)
-git init
-git add .
-git commit -m "Initial commit"
+1. [neon.tech](https://neon.tech) → **Sign Up** (GitHub ile)
+2. **Create Project** → Proje adı: `tsc-ticket`
+3. **Connection String**'i kopyala (bu `DATABASE_URL` olacak)
 
-# GitHub'da yeni repo oluştur ve bağla
-git remote add origin https://github.com/KULLANICI/tsc-ticket.git
-git branch -M main
-git push -u origin main
-```
+## Adım 2: GitHub'a Push
 
-## Adım 2: Railway Kurulumu
+VS Code'da:
+1. **Source Control** (Ctrl+Shift+G)
+2. Tüm değişiklikleri **Stage** et (+)
+3. Commit mesajı: `Vercel deployment ready`
+4. **Sync Changes** veya **Push**
 
-1. [railway.app](https://railway.app) adresine git
-2. **GitHub ile giriş yap**
-3. **"New Project"** → **"Deploy from GitHub repo"**
-4. `tsc-ticket` reposunu seç
+## Adım 3: Vercel Kurulumu
 
-## Adım 3: PostgreSQL Ekle
-
-1. Railway dashboard'da **"New"** → **"Database"** → **"PostgreSQL"**
-2. Otomatik olarak `DATABASE_URL` eklenecek
-
-## Adım 4: Environment Variables
-
-Railway dashboard'da **Variables** sekmesine git ve ekle:
+1. [vercel.com](https://vercel.com) → **GitHub ile giriş yap**
+2. **Add New...** → **Project**
+3. `tsc-ticket` reposunu **Import** et
+4. **Environment Variables** ekle:
 
 | Variable | Value |
 |----------|-------|
-| `NEXTAUTH_URL` | `https://[proje-adi].up.railway.app` |
+| `DATABASE_URL` | Neon connection string |
+| `NEXTAUTH_URL` | `https://proje-adi.vercel.app` |
 | `NEXTAUTH_SECRET` | `npx auth secret` ile oluştur |
 
-## Adım 5: Deploy
+5. **Deploy** butonuna tıkla
 
-1. Railway otomatik deploy edecek
-2. **"Generate Domain"** ile URL al
-3. `NEXTAUTH_URL`'i bu URL ile güncelle
+## Adım 4: Veritabanı Seed
 
-## Adım 6: Veritabanı Seed
-
-Railway'de terminal aç ve çalıştır:
+Deploy tamamlandıktan sonra, Vercel Dashboard → **Functions** → terminalde:
 ```bash
 npx prisma db push
 npm run db:seed
+```
+
+Veya lokal terminalden (Neon URL ile):
+```bash
+DATABASE_URL="postgresql://..." npx prisma db push
+DATABASE_URL="postgresql://..." npm run db:seed
 ```
 
 ## Kullanıcılar (Seed sonrası)
@@ -59,5 +53,7 @@ npm run db:seed
 | calisan@tsc.local | admin123 | Requester |
 
 ---
+
+> ⚠️ **Not**: Canlı chat (Socket.io) şu anda Vercel'de devre dışı. Ticket sistemi tam çalışır.
 
 ✅ **Tebrikler!** Sisteminiz artık canlıda!
