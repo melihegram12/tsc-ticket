@@ -4,12 +4,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-export async function GET(req: NextRequest, context: any) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
-    const { id } = paramsObj || {};
+    const { id } = await params;
 
     try {
         const asset = await prisma.asset.findUnique({
@@ -45,14 +44,13 @@ export async function GET(req: NextRequest, context: any) {
     }
 }
 
-export async function PUT(req: NextRequest, context: any) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session || (session.user.role !== 'Admin' && session.user.role !== 'Agent')) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
-    const { id } = paramsObj || {};
+    const { id } = await params;
 
     try {
         const data = await req.json();
@@ -89,14 +87,13 @@ export async function PUT(req: NextRequest, context: any) {
     }
 }
 
-export async function DELETE(req: NextRequest, context: any) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'Admin') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const paramsObj = context?.params && typeof context.params.then === 'function' ? await context.params : context?.params;
-    const { id } = paramsObj || {};
+    const { id } = await params;
 
     try {
         await prisma.asset.delete({ where: { id: parseInt(id) } });
@@ -105,4 +102,3 @@ export async function DELETE(req: NextRequest, context: any) {
         return NextResponse.json({ error: 'Failed to delete asset' }, { status: 500 });
     }
 }
-
