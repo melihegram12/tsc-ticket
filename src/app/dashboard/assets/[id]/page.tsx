@@ -72,7 +72,7 @@ export default function AssetDetailPage() {
     const { data: session } = useSession();
     const router = useRouter();
     const params = useParams();
-    const assetId = params.id as string;
+    const assetId = params?.id as string ?? '';
 
     const [asset, setAsset] = useState<Asset | null>(null);
     const [loading, setLoading] = useState(true);
