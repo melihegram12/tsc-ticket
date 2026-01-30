@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { AutomationService } from '@/lib/automation';
 import { notifyNewTicket } from '@/lib/notifications';
 import { Prisma } from '@prisma/client';
+import { logAuditAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 // Generate unique ticket number
 async function generateTicketNumber(): Promise<string> {
@@ -258,6 +259,17 @@ export async function POST(request: NextRequest) {
             priority
         ).catch(err => {
             console.error('Notification error:', err);
+        });
+
+        // Audit log
+        logAuditAction({
+            action: AUDIT_ACTIONS.TICKET_CREATE,
+            entity: 'ticket',
+            entityId: ticket.id,
+            newValue: { ticketNumber: ticket.ticketNumber, subject, priority, departmentId: departmentObj.id },
+            userId: parseInt(session.user.id),
+        }).catch(err => {
+            console.error('Audit log error:', err);
         });
 
         return NextResponse.json(ticket, { status: 201 });

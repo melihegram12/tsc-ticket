@@ -14,6 +14,7 @@ import {
     Key,
     Check,
 } from 'lucide-react';
+import TwoFactorSetup from '@/components/TwoFactorSetup';
 
 interface UserProfile {
     id: number;
@@ -341,6 +342,9 @@ export default function ProfilePage() {
                             </form>
                         )}
                     </div>
+
+                    {/* 2FA Settings */}
+                    <TwoFactorSetup />
                 </div>
             </div>
 

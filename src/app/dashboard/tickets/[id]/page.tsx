@@ -21,6 +21,8 @@ import {
     Download,
 } from 'lucide-react';
 import FileUpload from '@/components/file-upload';
+import SatisfactionModal from '@/components/SatisfactionModal';
+import PresenceIndicator from '@/components/PresenceIndicator';
 
 interface CannedResponse {
     id: number;
@@ -39,6 +41,8 @@ interface TicketDetail {
     lastActivityAt: string;
     firstResponseAt?: string;
     resolvedAt?: string;
+    satisfactionScore?: number | null;
+    satisfactionComment?: string | null;
     requester: { id: number; name: string; email: string };
     assignedTo?: { id: number; name: string };
     department: { id: number; name: string };
@@ -92,6 +96,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
     const [showCannedResponses, setShowCannedResponses] = useState(false);
     const [attachments, setAttachments] = useState<any[]>([]);
     const [showUpload, setShowUpload] = useState(false);
+    const [showSatisfactionModal, setShowSatisfactionModal] = useState(false);
 
     const isAgent = session?.user?.role !== 'Requester';
 
@@ -154,11 +159,29 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
             if (!response.ok) throw new Error('Güncelleme başarısız');
             const data = await response.json();
             setTicket(prev => prev ? { ...prev, ...data } : null);
+
+            // Check if status changed to RESOLVED and user is the requester
+            if (updates.status === 'RESOLVED' &&
+                ticket?.requester?.id === parseInt(session?.user?.id || '0') &&
+                !ticket?.satisfactionScore) {
+                setShowSatisfactionModal(true);
+            }
         } catch (error) {
             console.error('Failed to update ticket:', error);
         } finally {
             setUpdating(false);
         }
+    };
+
+    const handleSatisfactionSubmit = async (score: number, comment: string) => {
+        const response = await fetch(`/api/tickets/${resolvedParams.id}/satisfaction`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ satisfactionScore: score, satisfactionComment: comment }),
+        });
+        if (!response.ok) throw new Error('Failed to submit satisfaction');
+        const data = await response.json();
+        setTicket(prev => prev ? { ...prev, satisfactionScore: data.satisfactionScore, satisfactionComment: data.satisfactionComment } : null);
     };
 
     const sendMessage = async (e: React.FormEvent) => {
@@ -283,6 +306,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                         <h1>{ticket.subject}</h1>
                     </div>
                     <div className="header-badges">
+                        <PresenceIndicator ticketId={ticket.id} />
                         <span className={`badge status-${ticket.status.toLowerCase().replace('_', '-')}`}>
                             {getStatusLabel(ticket.status)}
                         </span>
@@ -912,6 +936,15 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
           }
         }
       `}</style>
+
+            {/* Satisfaction Modal */}
+            <SatisfactionModal
+                isOpen={showSatisfactionModal}
+                onClose={() => setShowSatisfactionModal(false)}
+                ticketId={ticket.id}
+                ticketNumber={ticket.ticketNumber}
+                onSubmit={handleSatisfactionSubmit}
+            />
         </div>
     );
 }

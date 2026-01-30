@@ -22,6 +22,8 @@ import {
   ChevronDown,
   BookOpen,
   Package,
+  FileSearch,
+  Zap,
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
 import NotificationCenter from '@/components/NotificationCenter';
@@ -46,6 +48,8 @@ const adminItems: NavItem[] = [
   { label: 'Raporlar', href: '/dashboard/reports', icon: <BarChart3 size={20} />, permission: 'report.view' },
   { label: 'Kullanıcılar', href: '/dashboard/admin/users', icon: <Users size={20} />, permission: 'admin.users' },
   { label: 'Departmanlar', href: '/dashboard/admin/departments', icon: <Building2 size={20} />, permission: 'admin.departments' },
+  { label: 'Otomasyon', href: '/dashboard/admin/automation', icon: <Zap size={20} />, permission: 'admin.automation' },
+  { label: 'Denetim Logları', href: '/dashboard/admin/audit', icon: <FileSearch size={20} />, permission: 'admin.audit' },
   { label: 'Ayarlar', href: '/dashboard/admin/settings', icon: <Settings size={20} />, permission: 'admin.settings' },
 ];
 
@@ -193,7 +197,7 @@ export default function DashboardLayout({
             </div>
             <div className="user-details">
               <span className="user-name">{session.user.name}</span>
-              <span className="user-role">{session.user.role}</span>
+              <span className="user-role">{session.user.role === 'Admin' ? 'Yönetici' : session.user.role === 'Agent' ? 'Destek Uzmanı' : session.user.role === 'Supervisor' ? 'Takım Lideri' : 'Personel'}</span>
             </div>
           </div>
         </div>

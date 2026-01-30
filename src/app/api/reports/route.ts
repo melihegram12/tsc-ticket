@@ -167,6 +167,25 @@ export async function GET() {
             resolved: a._count.id,
         }));
 
+        // Satisfaction statistics
+        const satisfactionStats = await prisma.ticket.aggregate({
+            where: {
+                ...deptFilter,
+                satisfactionScore: { not: null },
+            },
+            _avg: { satisfactionScore: true },
+            _count: { satisfactionScore: true },
+        });
+
+        const satisfactionDistribution = await prisma.ticket.groupBy({
+            by: ['satisfactionScore'],
+            where: {
+                ...deptFilter,
+                satisfactionScore: { not: null },
+            },
+            _count: { id: true },
+        });
+
         return NextResponse.json({
             overview: {
                 totalTickets,
@@ -192,6 +211,16 @@ export async function GET() {
                     : 100,
             },
             topAgents: topAgentStats,
+            satisfaction: {
+                averageScore: satisfactionStats._avg.satisfactionScore
+                    ? Math.round(satisfactionStats._avg.satisfactionScore * 10) / 10
+                    : null,
+                totalRatings: satisfactionStats._count.satisfactionScore,
+                distribution: satisfactionDistribution.map(s => ({
+                    score: s.satisfactionScore,
+                    count: s._count.id,
+                })),
+            },
         });
     } catch (error) {
         console.error('Error fetching reports:', error);

@@ -21,9 +21,20 @@ interface JoinChatPayload {
     userId: number;
 }
 
+// Ticket presence tracking
+interface TicketPresencePayload {
+    ticketId: number;
+    userId: number;
+    userName: string;
+}
+
+// In-memory ticket viewers map
+const ticketViewers = new Map<number, Map<string, { id: number; name: string; socketId: string }>>();
+
 let io: SocketIOServer | null = null;
 
 export const getIO = () => io;
+export const getTicketViewers = () => ticketViewers;
 
 export const initSocketServer = (server: NetServer) => {
     if (io) return io;
@@ -171,9 +182,71 @@ export const initSocketServer = (server: NetServer) => {
             }
         });
 
-        // Disconnect
+        // === TICKET PRESENCE ===
+
+        // Join ticket viewing
+        socket.on('join_ticket', (data: TicketPresencePayload) => {
+            const roomName = `ticket_${data.ticketId}`;
+            socket.join(roomName);
+
+            // Track viewer
+            if (!ticketViewers.has(data.ticketId)) {
+                ticketViewers.set(data.ticketId, new Map());
+            }
+            ticketViewers.get(data.ticketId)?.set(socket.id, {
+                id: data.userId,
+                name: data.userName,
+                socketId: socket.id,
+            });
+
+            // Notify others
+            const viewers = Array.from(ticketViewers.get(data.ticketId)?.values() || [])
+                .filter(v => v.socketId !== socket.id);
+
+            socket.to(roomName).emit('viewer_joined', {
+                ticketId: data.ticketId,
+                viewer: { id: data.userId, name: data.userName },
+                allViewers: viewers,
+            });
+
+            // Send current viewers to the joining user
+            socket.emit('current_viewers', {
+                ticketId: data.ticketId,
+                viewers: viewers,
+            });
+        });
+
+        // Leave ticket viewing
+        socket.on('leave_ticket', (data: { ticketId: number }) => {
+            const roomName = `ticket_${data.ticketId}`;
+            const viewer = ticketViewers.get(data.ticketId)?.get(socket.id);
+
+            socket.leave(roomName);
+            ticketViewers.get(data.ticketId)?.delete(socket.id);
+
+            if (viewer) {
+                socket.to(roomName).emit('viewer_left', {
+                    ticketId: data.ticketId,
+                    viewer: { id: viewer.id, name: viewer.name },
+                });
+            }
+        });
+
+        // Disconnect - clean up all ticket viewers
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);
+
+            // Clean up from all ticket rooms
+            ticketViewers.forEach((viewers, ticketId) => {
+                const viewer = viewers.get(socket.id);
+                if (viewer) {
+                    viewers.delete(socket.id);
+                    io?.to(`ticket_${ticketId}`).emit('viewer_left', {
+                        ticketId,
+                        viewer: { id: viewer.id, name: viewer.name },
+                    });
+                }
+            });
         });
     });
 

@@ -10,6 +10,7 @@ import {
     TrendingUp,
     Users,
     Building2,
+    Star,
 } from 'lucide-react';
 import {
     BarChart,
@@ -44,6 +45,11 @@ interface ReportData {
         compliance: number;
     };
     topAgents: Array<{ name: string; resolved: number }>;
+    satisfaction?: {
+        averageScore: number | null;
+        totalRatings: number;
+        distribution: Array<{ score: number; count: number }>;
+    };
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -318,6 +324,52 @@ export default function ReportsPage() {
                         )}
                     </div>
                 </div>
+
+                {/* Satisfaction Card */}
+                <div className="chart-card small">
+                    <h3>
+                        <Star size={18} />
+                        Müşteri Memnuniyeti
+                    </h3>
+                    {data.satisfaction && data.satisfaction.totalRatings > 0 ? (
+                        <div className="satisfaction-stats">
+                            <div className="satisfaction-score">
+                                <span className="score-value">{data.satisfaction.averageScore}</span>
+                                <span className="score-max">/5</span>
+                                <div className="star-display">
+                                    {[1, 2, 3, 4, 5].map(star => (
+                                        <Star
+                                            key={star}
+                                            size={20}
+                                            className={star <= (data.satisfaction?.averageScore || 0) ? 'star-filled' : 'star-empty'}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="rating-distribution">
+                                {[5, 4, 3, 2, 1].map(score => {
+                                    const ratingData = data.satisfaction?.distribution.find(d => d.score === score);
+                                    const count = ratingData?.count || 0;
+                                    const percentage = data.satisfaction?.totalRatings
+                                        ? Math.round((count / data.satisfaction.totalRatings) * 100)
+                                        : 0;
+                                    return (
+                                        <div key={score} className="rating-row">
+                                            <span className="rating-label">{score} ★</span>
+                                            <div className="rating-bar-container">
+                                                <div className="rating-bar" style={{ width: `${percentage}%` }} />
+                                            </div>
+                                            <span className="rating-count">{count}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <p className="rating-total">{data.satisfaction.totalRatings} toplam değerlendirme</p>
+                        </div>
+                    ) : (
+                        <p className="no-data">Henüz değerlendirme yok</p>
+                    )}
+                </div>
             </div>
 
             <style jsx>{`
@@ -530,6 +582,95 @@ export default function ReportsPage() {
                     font-size: 0.75rem;
                     color: var(--success-600);
                     font-weight: 500;
+                }
+
+                /* Satisfaction styles */
+                .satisfaction-stats {
+                    padding: 0.5rem 0;
+                }
+
+                .satisfaction-score {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.25rem;
+                    margin-bottom: 1rem;
+                    flex-wrap: wrap;
+                }
+
+                .score-value {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    color: var(--warning-500);
+                }
+
+                .score-max {
+                    font-size: 1.25rem;
+                    color: var(--gray-400);
+                    margin-right: 0.5rem;
+                }
+
+                .star-display {
+                    display: flex;
+                    gap: 0.125rem;
+                }
+
+                :global(.star-filled) {
+                    fill: #fbbf24;
+                    color: #fbbf24;
+                }
+
+                :global(.star-empty) {
+                    fill: none;
+                    color: #d1d5db;
+                }
+
+                .rating-distribution {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.375rem;
+                }
+
+                .rating-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .rating-label {
+                    width: 2.5rem;
+                    font-size: 0.75rem;
+                    color: var(--gray-600);
+                    text-align: right;
+                }
+
+                .rating-bar-container {
+                    flex: 1;
+                    height: 8px;
+                    background: var(--gray-200);
+                    border-radius: 4px;
+                    overflow: hidden;
+                }
+
+                .rating-bar {
+                    height: 100%;
+                    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+                    border-radius: 4px;
+                    transition: width 0.3s ease;
+                }
+
+                .rating-count {
+                    width: 2rem;
+                    font-size: 0.75rem;
+                    color: var(--gray-500);
+                    text-align: left;
+                }
+
+                .rating-total {
+                    text-align: center;
+                    font-size: 0.75rem;
+                    color: var(--gray-500);
+                    margin-top: 0.75rem;
                 }
             `}</style>
         </div>

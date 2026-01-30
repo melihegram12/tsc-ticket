@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TSC - Ticket Support Center 🎫
 
-## Getting Started
+Malhotra Helpdesk için dahili destek talep yönetim sistemi.
 
-First, run the development server:
+## 🚀 Özellikler
+
+- **Ticket Yönetimi** - Oluşturma, atama, durum takibi
+- **SLA Takibi** - Yanıt ve çözüm süresi izleme
+- **Memnuniyet Anketi** - Ticket çözümünde 5 yıldız puanlama
+- **Kayıtlı Aramalar** - Filtre kombinasyonlarını kaydetme
+- **Denetim Logları** - Admin için aktivite izleme
+- **Otomasyon Kuralları** - Otomatik ticket işlemleri
+- **Dashboard Widgets** - Özelleştirilebilir gösterge paneli
+- **Çakışma Uyarıları** - Aynı ticket'ı görüntüleyen kullanıcılar
+
+## 🛠 Teknolojiler
+
+- **Frontend:** Next.js 15 (App Router), React 19
+- **Backend:** Next.js API Routes
+- **Database:** PostgreSQL + Prisma ORM
+- **Auth:** NextAuth.js
+- **Styling:** CSS Modules
+
+## 📋 Kurulum
 
 ```bash
+# 1. Bağımlılıkları yükle
+npm install
+
+# 2. .env dosyası oluştur
+cp .env.example .env
+
+# 3. Veritabanı şemasını uygula
+npx prisma db push
+
+# 4. Seed verileri ekle
+npm run db:seed
+
+# 5. Geliştirme sunucusunu başlat
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Ortam Değişkenleri
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Değişken | Açıklama |
+|----------|----------|
+| `DATABASE_URL` | PostgreSQL bağlantı adresi |
+| `NEXTAUTH_URL` | Uygulama URL'i |
+| `NEXTAUTH_SECRET` | NextAuth secret key |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👥 Varsayılan Kullanıcılar (Seed sonrası)
 
-## Learn More
+| E-posta | Şifre | Rol |
+|---------|-------|-----|
+| admin@tsc.local | admin123 | Admin |
+| it.agent@tsc.local | admin123 | IT Agent |
+| hr.agent@tsc.local | admin123 | HR Agent |
+| calisan@tsc.local | admin123 | Requester |
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Proje Yapısı
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── api/              # API endpoints
+│   ├── dashboard/        # Dashboard sayfaları
+│   └── auth/             # Login sayfası
+├── components/
+│   ├── widgets/          # Dashboard widget bileşenleri
+│   └── ...               # Diğer bileşenler
+└── lib/                  # Utility fonksiyonlar
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deploy
 
-## Deploy on Vercel
+Detaylı deploy rehberi için [DEPLOY.md](./DEPLOY.md) dosyasına bakın.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Lisans:** MIT
