@@ -3,10 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { AutomationService } from '@/lib/automation';
-
-type TicketStatus = 'NEW' | 'OPEN' | 'WAITING_REQUESTER' | 'PENDING' | 'RESOLVED' | 'CLOSED' | 'REOPENED';
-type TicketPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
-type EventType = 'CREATED' | 'STATUS_CHANGED' | 'PRIORITY_CHANGED' | 'ASSIGNED' | 'UNASSIGNED' | 'CATEGORY_CHANGED' | 'DEPARTMENT_CHANGED' | 'TAG_ADDED' | 'TAG_REMOVED' | 'MESSAGE_ADDED' | 'ATTACHMENT_ADDED' | 'SLA_BREACHED' | 'REOPENED' | 'MERGED' | 'AUTOMATION';
+import { TicketStatus, TicketPriority, EventType } from '@prisma/client';
 
 // Check if user can access ticket
 async function canAccessTicket(userId: number, userRole: string, userDepts: number[], ticketId: number) {
@@ -139,9 +136,9 @@ export async function PATCH(
         const events: Array<{ eventType: EventType; oldValue?: string; newValue?: string }> = [];
 
         if (status && status !== currentTicket.status) {
-            updateData.status = status;
+            updateData.status = status as TicketStatus;
             events.push({
-                eventType: 'STATUS_CHANGED',
+                eventType: EventType.STATUS_CHANGED,
                 oldValue: currentTicket.status,
                 newValue: status,
             });
@@ -160,9 +157,9 @@ export async function PATCH(
         }
 
         if (priority && priority !== currentTicket.priority) {
-            updateData.priority = priority;
+            updateData.priority = priority as TicketPriority;
             events.push({
-                eventType: 'PRIORITY_CHANGED',
+                eventType: EventType.PRIORITY_CHANGED,
                 oldValue: currentTicket.priority,
                 newValue: priority,
             });
@@ -171,7 +168,7 @@ export async function PATCH(
         if (categoryId !== undefined && categoryId !== currentTicket.categoryId) {
             updateData.categoryId = categoryId;
             events.push({
-                eventType: 'CATEGORY_CHANGED',
+                eventType: EventType.CATEGORY_CHANGED,
                 oldValue: currentTicket.categoryId?.toString(),
                 newValue: categoryId?.toString(),
             });
@@ -180,7 +177,7 @@ export async function PATCH(
         if (assignedToId !== undefined && assignedToId !== currentTicket.assignedToId) {
             updateData.assignedToId = assignedToId;
             events.push({
-                eventType: assignedToId ? 'ASSIGNED' : 'UNASSIGNED',
+                eventType: assignedToId ? EventType.ASSIGNED : EventType.UNASSIGNED,
                 oldValue: currentTicket.assignedToId?.toString(),
                 newValue: assignedToId?.toString(),
             });
@@ -189,7 +186,7 @@ export async function PATCH(
         if (departmentId && departmentId !== currentTicket.departmentId) {
             updateData.departmentId = departmentId;
             events.push({
-                eventType: 'DEPARTMENT_CHANGED',
+                eventType: EventType.DEPARTMENT_CHANGED,
                 oldValue: currentTicket.departmentId.toString(),
                 newValue: departmentId.toString(),
             });

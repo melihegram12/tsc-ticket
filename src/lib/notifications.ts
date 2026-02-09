@@ -1,14 +1,7 @@
 import prisma from './prisma';
+import { NotificationType, Prisma } from '@prisma/client';
 
-// Notification types
-export type NotificationType =
-    | 'TICKET_CREATED'
-    | 'TICKET_ASSIGNED'
-    | 'TICKET_UPDATED'
-    | 'TICKET_REPLIED'
-    | 'SLA_WARNING'
-    | 'SLA_BREACH'
-    | 'CHAT_MESSAGE';
+export { NotificationType };
 
 /**
  * Create a notification for a user
@@ -27,7 +20,7 @@ export async function createNotification(
                 type,
                 title,
                 message,
-                data: data ? JSON.stringify(data) : null,
+                data: (data ?? Prisma.DbNull) as any,
             },
         });
     } catch (error) {

@@ -1,4 +1,5 @@
 import prisma from './prisma';
+import { EventType } from '@prisma/client';
 
 export type TriggerEvent = 'TICKET_CREATED' | 'TICKET_UPDATED' | 'HOURLY_CHECK';
 
@@ -54,7 +55,7 @@ export class AutomationService {
                         // Log event
                         events: {
                             create: {
-                                eventType: 'AUTOMATION',
+                                eventType: EventType.AUTOMATION,
                                 newValue: 'Otomatik olarak Muhasebe departmanına atandı (Fatura kuralı)',
                                 actorId: 1 // System
                             }
@@ -82,7 +83,7 @@ export class AutomationService {
                     priority: 'URGENT',
                     events: {
                         create: {
-                            eventType: 'AUTOMATION',
+                            eventType: EventType.AUTOMATION,
                             newValue: 'VIP Müşteri kuralı ile ACİL öncelik atandı',
                             actorId: 1
                         }
@@ -112,7 +113,7 @@ export class AutomationService {
                     status: 'RESOLVED',
                     events: {
                         create: {
-                            eventType: 'AUTOMATION',
+                            eventType: EventType.AUTOMATION,
                             newValue: '3 gün işlem yapılmadığı için otomatik çözüldü',
                             actorId: 1
                         }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { EventType } from '@prisma/client';
 
 // PUT /api/tickets/[id]/satisfaction
 export async function PUT(
@@ -72,7 +73,7 @@ export async function PUT(
                 satisfactionComment: satisfactionComment || null,
                 events: {
                     create: {
-                        eventType: 'SATISFACTION_RATED',
+                        eventType: EventType.SATISFACTION_RATED,
                         newValue: `Puan: ${satisfactionScore}/5${satisfactionComment ? ' - Yorum eklendi' : ''}`,
                         actorId: userId,
                     },

@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
             prisma.auditLog.count({ where }),
         ]);
 
-        // Parse JSON fields
+        // No need to parse JSON fields as they are already objects
         const parsedLogs = logs.map(log => ({
             ...log,
-            oldValue: log.oldValue ? JSON.parse(log.oldValue) : null,
-            newValue: log.newValue ? JSON.parse(log.newValue) : null,
+            oldValue: log.oldValue,
+            newValue: log.newValue,
         }));
 
         // Get distinct actions and entities for filters

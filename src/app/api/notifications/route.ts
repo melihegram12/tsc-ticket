@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { NotificationType, Prisma } from '@prisma/client';
 
 // GET /api/notifications - Get user's notifications
 export async function GET(request: NextRequest) {
@@ -73,10 +74,10 @@ export async function POST(request: NextRequest) {
         const notification = await prisma.notification.create({
             data: {
                 userId,
-                type,
+                type: type as NotificationType,
                 title,
                 message,
-                data: data ? JSON.stringify(data) : null,
+                data: (data ?? Prisma.DbNull) as any,
             },
         });
 
@@ -142,10 +143,10 @@ export async function createNotification(
         await prisma.notification.create({
             data: {
                 userId,
-                type,
+                type: type as NotificationType,
                 title,
                 message,
-                data: data ? JSON.stringify(data) : null,
+                data: (data ?? Prisma.DbNull) as any,
             },
         });
     } catch (error) {

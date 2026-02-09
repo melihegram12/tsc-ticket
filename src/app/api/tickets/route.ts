@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { AutomationService } from '@/lib/automation';
 import { notifyNewTicket } from '@/lib/notifications';
-import { Prisma } from '@prisma/client';
+import { Prisma, TicketPriority, EventType } from '@prisma/client';
 import { logAuditAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 // Generate unique ticket number
@@ -34,7 +34,7 @@ async function generateTicketNumber(): Promise<string> {
 }
 
 // Calculate SLA due dates
-async function calculateSLADates(departmentId: number, priority: string) {
+async function calculateSLADates(departmentId: number, priority: TicketPriority) {
     const slaPolicy = await prisma.sLAPolicy.findUnique({
         where: {
             departmentId_priority: { departmentId, priority },
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
         }
 
         const ticketNumber = await generateTicketNumber();
-        const slaDates = await calculateSLADates(departmentObj.id, priority);
+        const slaDates = await calculateSLADates(departmentObj.id, priority as TicketPriority);
 
         const ticket = await prisma.ticket.create({
             data: {
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
                 requesterName,
                 subject,
                 description,
-                priority,
+                priority: priority as TicketPriority,
                 requesterId: parseInt(session.user.id),
                 departmentId: departmentObj.id,
                 categoryId: null,
@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
                     : undefined,
                 events: {
                     create: {
-                        eventType: 'CREATED',
+                        eventType: EventType.CREATED,
                         actorId: parseInt(session.user.id),
                         newValue: JSON.stringify({ subject, priority, departmentId: departmentObj.id }),
                     },

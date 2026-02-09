@@ -91,7 +91,7 @@ export async function PATCH(
 
         return NextResponse.json({
             ...updated,
-            filters: JSON.parse(updated.filters),
+            filters: updated.filters,
         });
     } catch (error) {
         console.error('Error updating saved search:', error);

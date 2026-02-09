@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 interface AuditLogData {
     action: string;
@@ -21,8 +22,8 @@ export async function logAuditAction(data: AuditLogData): Promise<void> {
                 action: data.action,
                 entity: data.entity,
                 entityId: data.entityId || null,
-                oldValue: data.oldValue ? JSON.stringify(data.oldValue) : null,
-                newValue: data.newValue ? JSON.stringify(data.newValue) : null,
+                oldValue: (data.oldValue ?? Prisma.DbNull) as any,
+                newValue: (data.newValue ?? Prisma.DbNull) as any,
                 userId: data.userId || null,
                 ipAddress: data.ipAddress || null,
                 userAgent: data.userAgent || null,

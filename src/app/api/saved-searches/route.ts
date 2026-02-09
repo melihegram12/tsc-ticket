@@ -21,10 +21,10 @@ export async function GET() {
             ],
         });
 
-        // Parse filters JSON for each search
+        // JSON fields are already objects
         const searches = savedSearches.map(search => ({
             ...search,
-            filters: JSON.parse(search.filters),
+            filters: search.filters,
         }));
 
         return NextResponse.json(searches);
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         const savedSearch = await prisma.savedSearch.create({
             data: {
                 name: name.trim(),
-                filters: JSON.stringify(filters),
+                filters: filters, // Pass object directly
                 isDefault: isDefault || false,
                 userId,
             },
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             ...savedSearch,
-            filters: JSON.parse(savedSearch.filters),
+            filters: savedSearch.filters,
         }, { status: 201 });
     } catch (error) {
         console.error('Error creating saved search:', error);

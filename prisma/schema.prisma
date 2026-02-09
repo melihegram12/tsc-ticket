@@ -300,6 +300,8 @@ enum EventType {
   SLA_BREACHED
   REOPENED
   MERGED
+  AUTOMATION
+  SATISFACTION_RATED
 }
 
 model TicketEvent {
