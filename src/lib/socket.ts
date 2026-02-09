@@ -273,7 +273,11 @@ export const emitToChat = (sessionId: number, event: string, data: unknown) => {
     io?.to(`chat_${sessionId}`).emit(event, data);
 };
 
-// Emit to all connected agents (for new chat notifications)
-export const emitToAgents = (event: string, data: unknown) => {
-    io?.emit(event, data);
+// Emit notification to specific user
+export const emitNotification = (userId: number, notification: any) => {
+    // In a real app, we would map userId to socketId.
+    // For now, we broadcast to a room named user_{userId} if we implement user rooms,
+    // or just broadcast to everyone and let client filter (not secure but simple for MVP).
+    // Better approach: Since we don't have user->socket mapping yet, let's emit to all and filter on client.
+    io?.emit('notification', { userId, notification });
 };

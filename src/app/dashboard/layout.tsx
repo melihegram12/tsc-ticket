@@ -25,6 +25,7 @@ import {
   FileSearch,
   Zap,
   Mail,
+  Trello,
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
 import NotificationCenter from '@/components/NotificationCenter';
@@ -41,6 +42,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={20} /> },
   { label: 'Yeni Talep', href: '/dashboard/tickets/new', icon: <Plus size={20} /> },
   { label: 'Talepler', href: '/dashboard/tickets', icon: <List size={20} /> },
+  { label: 'Kanban', href: '/dashboard/tickets/kanban', icon: <Trello size={20} /> },
   { label: 'Canlı Destek', href: '/dashboard/chat', icon: <MessageSquare size={20} /> },
   { label: 'Bilgi Bankası', href: '/dashboard/kb', icon: <BookOpen size={20} /> },
   { label: 'Varlıklar', href: '/dashboard/assets', icon: <Package size={20} /> },
