@@ -6,8 +6,8 @@ let mainWindow = null;
 let tray = null;
 
 // Server URL - merkezi sunucu adresi
-// Üretim sunucusu: 10.166.1.23
-const SERVER_URL = process.env.TSC_SERVER_URL || 'http://10.166.1.23:3000';
+// Geliştirme: http://localhost:3000
+const SERVER_URL = process.env.TSC_SERVER_URL || 'http://localhost:3000';
 
 // Connection retry settings
 let retryCount = 0;

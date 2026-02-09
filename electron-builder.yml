@@ -16,16 +16,16 @@ win:
     - target: nsis
       arch:
         - x64
-  icon: assets/icon.png
+#  icon: assets/icon.png
   artifactName: TSC-Setup-${version}.${ext}
 
 nsis:
   oneClick: false
   perMachine: true
   allowToChangeInstallationDirectory: true
-  installerIcon: assets/icon.png
-  uninstallerIcon: assets/icon.png
-  installerHeaderIcon: assets/icon.png
+#  installerIcon: assets/icon.png
+#  uninstallerIcon: assets/icon.png
+#  installerHeaderIcon: assets/icon.png
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: TSC Support Center
