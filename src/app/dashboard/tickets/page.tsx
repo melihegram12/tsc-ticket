@@ -563,7 +563,7 @@ export default function TicketsPage() {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid #1a1a1a;
             padding-bottom: 0rem;
         }
 
@@ -571,7 +571,7 @@ export default function TicketsPage() {
             padding: 0.75rem 1rem;
             border: none;
             background: none;
-            color: var(--gray-500);
+            color: #525252;
             font-weight: 500;
             font-size: 0.875rem;
             cursor: pointer;
@@ -580,25 +580,25 @@ export default function TicketsPage() {
         }
 
         .queue-tab:hover {
-            color: var(--gray-700);
-            background: var(--gray-50);
+            color: #a3a3a3;
+            background: #1a1a1a;
         }
 
         .queue-tab.active {
-            color: var(--primary-600);
-            border-bottom-color: var(--primary-600);
-            background: var(--primary-50);
+            color: #06b6d4;
+            border-bottom-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
         }
 
         .page-header h1 {
           font-size: 1.5rem;
           font-weight: 700;
-          color: var(--gray-900);
+          color: #fff;
           margin: 0 0 0.25rem 0;
         }
 
         .page-header p {
-          color: var(--gray-500);
+          color: #525252;
           margin: 0;
         }
 
@@ -623,7 +623,7 @@ export default function TicketsPage() {
           left: 0.875rem;
           top: 50%;
           transform: translateY(-50%);
-          color: var(--gray-400);
+          color: #525252;
         }
 
         .search-input {
@@ -631,9 +631,9 @@ export default function TicketsPage() {
         }
 
         .btn.active {
-          background: var(--primary-50);
-          border-color: var(--primary-200);
-          color: var(--primary-600);
+          background: rgba(6, 182, 212, 0.1);
+          border-color: rgba(6, 182, 212, 0.3);
+          color: #06b6d4;
         }
 
         .filter-count {
@@ -727,8 +727,8 @@ export default function TicketsPage() {
         .filters-panel {
           margin-top: 1rem;
           padding: 1rem;
-          background: white;
-          border: 1px solid var(--gray-200);
+          background: #0a0a0a;
+          border: 1px solid #1a1a1a;
           border-radius: 0.5rem;
           display: flex;
           gap: 2rem;
@@ -740,7 +740,7 @@ export default function TicketsPage() {
           display: block;
           font-size: 0.75rem;
           font-weight: 600;
-          color: var(--gray-500);
+          color: #525252;
           margin-bottom: 0.5rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
@@ -757,12 +757,12 @@ export default function TicketsPage() {
           align-items: center;
           gap: 0.375rem;
           font-size: 0.875rem;
-          color: var(--gray-700);
+          color: #a3a3a3;
           cursor: pointer;
         }
 
         .filter-option input {
-          accent-color: var(--primary-500);
+          accent-color: #06b6d4;
         }
 
         .table-wrapper {
@@ -775,12 +775,12 @@ export default function TicketsPage() {
         }
 
         .clickable-row:hover {
-          background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.04)) !important;
+          background: rgba(6, 182, 212, 0.08) !important;
           transform: scale(1.005);
         }
 
         .clickable-row:hover .ticket-number {
-          color: var(--primary-700);
+          color: #22d3ee;
         }
 
         .clickable-row:active {
@@ -796,7 +796,7 @@ export default function TicketsPage() {
           display: flex;
           gap: 1rem;
           padding: 1rem;
-          border-bottom: 1px solid var(--gray-100);
+          border-bottom: 1px solid #1a1a1a;
           animation: fadeInUp 0.4s ease-out both;
         }
 

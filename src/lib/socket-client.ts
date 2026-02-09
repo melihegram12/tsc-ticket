@@ -6,11 +6,8 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
     if (!socket) {
-        // Initialize socket server if not running
-        fetch('/api/socket/io').catch((err) => console.error('Socket init error:', err));
-
         socket = io({
-            path: '/api/socket',
+            path: '/socket.io',
             transports: ['websocket', 'polling'],
             autoConnect: true,
         });

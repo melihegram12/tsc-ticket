@@ -3,9 +3,8 @@
 import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Ticket, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, AlertCircle, Shield, Sparkles } from 'lucide-react';
 
-// Force rebuild 2026-01-27
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,85 +44,51 @@ function LoginForm() {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Left side - Branding */}
-        <div className="login-branding">
-          <div className="branding-content">
-            <div className="logo-wrapper">
-              <div className="logo-icon">
-                <Ticket size={40} />
-              </div>
-              <h1>Malhotra Helpdesk</h1>
-            </div>
-            <p className="tagline">Şirket İçi Destek Sistemi</p>
-            <div className="features">
-              <div className="feature">
-                <span className="feature-icon">🎫</span>
-                <span>Ticket Yönetimi</span>
-              </div>
-              <div className="feature">
-                <span className="feature-icon">⏱️</span>
-                <span>SLA Takibi</span>
-              </div>
-              <div className="feature">
-                <span className="feature-icon">💬</span>
-                <span>Canlı Destek</span>
-              </div>
-              <div className="feature">
-                <span className="feature-icon">📊</span>
-                <span>Raporlama</span>
-              </div>
-            </div>
-          </div>
-          <div className="branding-bg"></div>
+        {/* Brand */}
+        <div className="brand">
+          <h1>
+            <span className="text-white">Malhotra</span>
+            <span className="text-gradient"> Helpdesk.</span>
+          </h1>
+          <p>Şirket İçi Destek Sistemi</p>
         </div>
 
-        {/* Right side - Login Form */}
-        <div className="login-form-wrapper">
-          <div className="login-form-container">
-            <div className="form-header">
-              <h2>Hoş Geldiniz</h2>
-              <p>Devam etmek için giriş yapın</p>
+        {/* Login Form */}
+        <div className="form-card">
+          {/* Login Type Tabs */}
+          <div className="tabs">
+            <button
+              className={`tab ${password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
+              onClick={() => { setPassword(''); setError(''); }}
+            >
+              <Shield size={16} />
+              Yönetici / Destek
+            </button>
+            <button
+              className={`tab ${password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
+              onClick={() => { setPassword('SKIP_PASSWORD_CHECK_FOR_REQUESTER'); setError(''); }}
+            >
+              <Sparkles size={16} />
+              Personel
+            </button>
+          </div>
+
+          {error && (
+            <div className="alert">
+              <AlertCircle size={16} />
+              <span>{error}</span>
             </div>
+          )}
 
-            {/* Login Type Tabs */}
-            <div className="login-tabs">
-              <button
-                className={`login-tab ${password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
-                onClick={() => {
-                  setPassword('');
-                  setError('');
-                }}
-              >
-                Yönetici / Destek
-              </button>
-              <button
-                className={`login-tab ${password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' ? 'active' : ''}`}
-                onClick={() => {
-                  setPassword('SKIP_PASSWORD_CHECK_FOR_REQUESTER');
-                  setError('');
-                }}
-              >
-                Personel
-              </button>
-            </div>
-
-            {error && (
-              <div className="error-alert">
-                <AlertCircle size={18} />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="login-form">
-              {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="form-group">
-                  <label htmlFor="email">E-posta</label>
+          <form onSubmit={handleSubmit}>
+            {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
+              <>
+                <div className="input-group">
+                  <label>E-posta</label>
                   <div className="input-wrapper">
-                    <Mail size={18} className="input-icon" />
+                    <Mail size={18} />
                     <input
-                      id="email"
                       type="email"
-                      className="input"
                       placeholder="ornek@sirket.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -132,19 +97,13 @@ function LoginForm() {
                     />
                   </div>
                 </div>
-              )}
 
-              {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="form-group">
-                  <div className="flex justify-between items-center mb-1">
-                    <label htmlFor="password">Şifre</label>
-                  </div>
+                <div className="input-group">
+                  <label>Şifre</label>
                   <div className="input-wrapper">
-                    <Lock size={18} className="input-icon" />
+                    <Lock size={18} />
                     <input
-                      id="password"
                       type={showPassword ? 'text' : 'password'}
-                      className="input"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -153,7 +112,7 @@ function LoginForm() {
                     />
                     <button
                       type="button"
-                      className="password-toggle"
+                      className="toggle-pw"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                     >
@@ -161,338 +120,263 @@ function LoginForm() {
                     </button>
                   </div>
                 </div>
-              )}
+              </>
+            )}
 
-              {password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                <div className="info-alert">
-                  <span>Personel girişi için bilgilerinize gerek yoktur. Direkt giriş yapabilirsiniz.</span>
-                </div>
-              )}
-
-              <div className="form-options">
-                <label className="checkbox-label">
-                  <input type="checkbox" />
-                  <span>Beni hatırla</span>
-                </label>
-                {password !== 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
-                  <a href="#" className="forgot-link">Şifremi unuttum</a>
-                )}
+            {password === 'SKIP_PASSWORD_CHECK_FOR_REQUESTER' && (
+              <div className="info-box">
+                Personel girişi için bilgilerinize gerek yoktur.
               </div>
+            )}
 
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg submit-btn"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner"></span>
-                    Giriş yapılıyor...
-                  </>
-                ) : (
-                  'Giriş Yap'
-                )}
-              </button>
-            </form>
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Giriş yapılıyor...
+                </>
+              ) : (
+                'Giriş Yap'
+              )}
+            </button>
+          </form>
+        </div>
 
-
-          </div>
+        <div className="footer">
+          © 2026 Malhotra Kablo
         </div>
       </div>
 
       <style jsx>{`
         .login-page {
           min-height: 100vh;
+          background: #000;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--gray-100);
-          padding: 1rem;
+          padding: 2rem;
         }
 
         .login-container {
-          display: flex;
           width: 100%;
-          max-width: 1000px;
-          min-height: 600px;
-          background: white;
-          border-radius: 1rem;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-          overflow: hidden;
+          max-width: 400px;
+          animation: fadeIn 0.6s ease-out;
         }
 
-        .login-branding {
-          flex: 1;
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 3rem;
-          background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
-          color: white;
-          overflow: hidden;
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        .branding-content {
-          position: relative;
-          z-index: 1;
-        }
-
-        .branding-bg {
-          position: absolute;
-          inset: 0;
-          background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .logo-wrapper {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .logo-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 64px;
-          height: 64px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 1rem;
-        }
-
-        .logo-wrapper h1 {
-          font-size: 2rem;
-          font-weight: 700;
-          margin: 0;
-        }
-
-        .tagline {
-          font-size: 1.125rem;
-          opacity: 0.9;
-          margin: 0 0 2.5rem 0;
-        }
-
-        .features {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-        }
-
-        .feature {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 0.5rem;
-          font-size: 0.9rem;
-        }
-
-        .feature-icon {
-          font-size: 1.25rem;
-        }
-
-        .login-form-wrapper {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 3rem;
-        }
-
-        .login-form-container {
-          width: 100%;
-          max-width: 360px;
-        }
-
-        .form-header {
+        .brand {
           text-align: center;
-          margin-bottom: 2rem;
+          margin-bottom: 3rem;
         }
 
-        .form-header h2 {
-          font-size: 1.5rem;
+        .brand h1 {
+          font-size: 2.5rem;
           font-weight: 700;
-          color: var(--gray-900);
-          margin: 0 0 0.5rem 0;
+          margin: 0 0 0.5rem;
+          letter-spacing: -0.02em;
         }
 
-        .form-header p {
-          color: var(--gray-500);
+        .text-white {
+          color: #fff;
+        }
+
+        .text-gradient {
+          background: linear-gradient(90deg, #06b6d4, #10b981);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .brand p {
+          color: #525252;
+          font-size: 0.9rem;
           margin: 0;
         }
 
-        .login-tabs {
+        .form-card {
+          background: #0a0a0a;
+          border: 1px solid #1a1a1a;
+          border-radius: 16px;
+          padding: 1.5rem;
+        }
+
+        .tabs {
           display: flex;
-          background: var(--gray-100);
-          padding: 0.25rem;
-          border-radius: 0.5rem;
+          gap: 0.5rem;
           margin-bottom: 1.5rem;
         }
 
-        .login-tab {
+        .tab {
           flex: 1;
-          padding: 0.5rem;
-          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.75rem;
           background: transparent;
-          color: var(--gray-600);
+          border: 1px solid #262626;
+          border-radius: 8px;
+          color: #737373;
+          font-size: 0.8125rem;
           font-weight: 500;
-          font-size: 0.875rem;
-          border-radius: 0.25rem;
           cursor: pointer;
           transition: all 0.2s;
         }
 
-        .login-tab.active {
-          background: white;
-          color: var(--primary-600);
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        .tab:hover {
+          border-color: #404040;
+          color: #a3a3a3;
         }
 
-        .error-alert {
+        .tab.active {
+          background: linear-gradient(135deg, #06b6d4, #10b981);
+          border-color: transparent;
+          color: #000;
+        }
+
+        .alert {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: var(--danger-50);
-          color: var(--danger-600);
-          border-radius: 0.5rem;
-          margin-bottom: 1.5rem;
-          font-size: 0.875rem;
-        }
-
-        .info-alert {
-          padding: 0.75rem 1rem;
-          background: var(--primary-50);
-          color: var(--primary-700);
-          border-radius: 0.5rem;
+          padding: 0.75rem;
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 8px;
+          color: #f87171;
+          font-size: 0.8125rem;
           margin-bottom: 1rem;
-          font-size: 0.875rem;
+        }
+
+        .info-box {
+          padding: 1rem;
+          background: rgba(6, 182, 212, 0.1);
+          border: 1px solid rgba(6, 182, 212, 0.2);
+          border-radius: 8px;
+          color: #22d3ee;
+          font-size: 0.8125rem;
           text-align: center;
-          border: 1px solid var(--primary-100);
+          margin-bottom: 1rem;
         }
 
-        .login-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
+        .input-group {
+          margin-bottom: 1rem;
         }
 
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .form-group label {
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--gray-700);
+        .input-group label {
+          display: block;
+          color: #a3a3a3;
+          font-size: 0.8125rem;
+          margin-bottom: 0.5rem;
         }
 
         .input-wrapper {
           position: relative;
+          display: flex;
+          align-items: center;
         }
 
-        .input-icon {
+        .input-wrapper > :global(svg:first-child) {
           position: absolute;
           left: 0.875rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: var(--gray-400);
+          color: #525252;
+          pointer-events: none;
         }
 
-        .input-wrapper .input {
-          padding-left: 2.75rem;
-          padding-right: 2.75rem;
+        .input-wrapper input {
+          width: 100%;
+          padding: 0.75rem 0.875rem 0.75rem 2.75rem;
+          background: #000;
+          border: 1px solid #262626;
+          border-radius: 8px;
+          color: #fff;
+          font-size: 0.875rem;
+          transition: all 0.2s;
         }
 
-        .password-toggle {
+        .input-wrapper input::placeholder {
+          color: #525252;
+        }
+
+        .input-wrapper input:focus {
+          outline: none;
+          border-color: #06b6d4;
+          box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .toggle-pw {
           position: absolute;
-          right: 0.875rem;
-          top: 50%;
-          transform: translateY(-50%);
+          right: 0.75rem;
           background: none;
           border: none;
-          color: var(--gray-400);
+          color: #525252;
           cursor: pointer;
           padding: 0;
           display: flex;
         }
 
-        .password-toggle:hover {
-          color: var(--gray-600);
-        }
-
-        .form-options {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 0.875rem;
-        }
-
-        .checkbox-label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: var(--gray-600);
-          cursor: pointer;
-        }
-
-        .checkbox-label input {
-          width: 16px;
-          height: 16px;
-          accent-color: var(--primary-500);
-        }
-
-        .forgot-link {
-          color: var(--primary-600);
-          text-decoration: none;
-        }
-
-        .forgot-link:hover {
-          text-decoration: underline;
+        .toggle-pw:hover {
+          color: #a3a3a3;
         }
 
         .submit-btn {
           width: 100%;
-          margin-top: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.875rem;
+          background: linear-gradient(90deg, #06b6d4, #10b981);
+          border: none;
+          border-radius: 8px;
+          color: #000;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          opacity: 0.9;
+          transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
 
         .spinner {
-          width: 18px;
-          height: 18px;
+          width: 16px;
+          height: 16px;
           border: 2px solid transparent;
-          border-top-color: white;
+          border-top-color: #000;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
+          to { transform: rotate(360deg); }
         }
 
+        .footer {
+          text-align: center;
+          margin-top: 2rem;
+          color: #404040;
+          font-size: 0.75rem;
+        }
 
-
-        @media (max-width: 768px) {
-          .login-container {
-            flex-direction: column;
-            min-height: auto;
+        @media (max-width: 480px) {
+          .brand h1 {
+            font-size: 2rem;
           }
-
-          .login-branding {
-            padding: 2rem;
-          }
-
-          .features {
-            grid-template-columns: 1fr;
-          }
-
-          .login-form-wrapper {
-            padding: 2rem;
+          
+          .tab {
+            font-size: 0.75rem;
+            padding: 0.625rem;
           }
         }
       `}</style>
@@ -502,7 +386,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-100">Loading...</div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#525252' }}>Yükleniyor...</div>}>
       <LoginForm />
     </Suspense>
   );

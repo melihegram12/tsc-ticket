@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { Users, Eye } from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import { Users, Eye, Wifi, WifiOff } from 'lucide-react';
+import { getSocket } from '@/lib/socket-client';
 
 interface Viewer {
     id: number;
     name: string;
-    initials: string;
 }
 
 interface PresenceIndicatorProps {
@@ -14,42 +15,83 @@ interface PresenceIndicatorProps {
 }
 
 export default function PresenceIndicator({ ticketId }: PresenceIndicatorProps) {
+    const { data: session } = useSession();
     const [viewers, setViewers] = useState<Viewer[]>([]);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [isConnected, setIsConnected] = useState(false);
+    const socketRef = useRef<ReturnType<typeof getSocket> | null>(null);
 
-    const updatePresence = useCallback(async () => {
-        try {
-            const res = await fetch(`/api/tickets/${ticketId}/presence`, { method: 'POST' });
-            if (res.ok) {
-                const data = await res.json();
-                setViewers(data.viewers || []);
-            }
-        } catch (error) {
-            console.error('Presence update failed:', error);
-        }
-    }, [ticketId]);
-
-    const leavePresence = useCallback(async () => {
-        try {
-            await fetch(`/api/tickets/${ticketId}/presence`, { method: 'DELETE' });
-        } catch (error) {
-            console.error('Leave presence failed:', error);
-        }
-    }, [ticketId]);
+    const getInitials = useCallback((name: string) => {
+        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }, []);
 
     useEffect(() => {
-        // Register presence immediately
-        updatePresence();
+        if (!session?.user) return;
 
-        // Heartbeat every 15 seconds
-        const interval = setInterval(updatePresence, 15000);
+        const socket = getSocket();
+        socketRef.current = socket;
 
-        // Clean up on unmount
-        return () => {
-            clearInterval(interval);
-            leavePresence();
+        const userId = parseInt(session.user.id);
+        const userName = session.user.name || 'Kullanıcı';
+
+        // Connection handlers
+        const handleConnect = () => {
+            setIsConnected(true);
+            // Join ticket room on connect
+            socket.emit('join_ticket', { ticketId, userId, userName });
         };
-    }, [updatePresence, leavePresence]);
+
+        const handleDisconnect = () => {
+            setIsConnected(false);
+            setViewers([]);
+        };
+
+        // Viewer handlers
+        const handleCurrentViewers = (data: { ticketId: number; viewers: Viewer[] }) => {
+            if (data.ticketId === ticketId) {
+                setViewers(data.viewers.filter(v => v.id !== userId));
+            }
+        };
+
+        const handleViewerJoined = (data: { ticketId: number; viewer: Viewer; allViewers: Viewer[] }) => {
+            if (data.ticketId === ticketId && data.viewer.id !== userId) {
+                setViewers(prev => {
+                    const exists = prev.some(v => v.id === data.viewer.id);
+                    if (exists) return prev;
+                    return [...prev, data.viewer];
+                });
+            }
+        };
+
+        const handleViewerLeft = (data: { ticketId: number; viewer: Viewer }) => {
+            if (data.ticketId === ticketId) {
+                setViewers(prev => prev.filter(v => v.id !== data.viewer.id));
+            }
+        };
+
+        // Register event listeners
+        socket.on('connect', handleConnect);
+        socket.on('disconnect', handleDisconnect);
+        socket.on('current_viewers', handleCurrentViewers);
+        socket.on('viewer_joined', handleViewerJoined);
+        socket.on('viewer_left', handleViewerLeft);
+
+        // If already connected, join immediately
+        if (socket.connected) {
+            setIsConnected(true);
+            socket.emit('join_ticket', { ticketId, userId, userName });
+        }
+
+        // Cleanup on unmount
+        return () => {
+            socket.emit('leave_ticket', { ticketId });
+            socket.off('connect', handleConnect);
+            socket.off('disconnect', handleDisconnect);
+            socket.off('current_viewers', handleCurrentViewers);
+            socket.off('viewer_joined', handleViewerJoined);
+            socket.off('viewer_left', handleViewerLeft);
+        };
+    }, [ticketId, session]);
 
     if (viewers.length === 0) return null;
 
@@ -60,7 +102,7 @@ export default function PresenceIndicator({ ticketId }: PresenceIndicatorProps) 
             onMouseLeave={() => setShowTooltip(false)}
         >
             <div className="presence-badge">
-                <Eye size={14} />
+                {isConnected ? <Eye size={14} /> : <WifiOff size={14} />}
                 <span className="viewer-count">{viewers.length}</span>
             </div>
 
@@ -69,11 +111,12 @@ export default function PresenceIndicator({ ticketId }: PresenceIndicatorProps) 
                     <div className="tooltip-header">
                         <Users size={14} />
                         <span>Şu an görüntülüyor</span>
+                        {isConnected && <Wifi size={12} className="live-icon" />}
                     </div>
                     <div className="viewer-list">
                         {viewers.map(v => (
                             <div key={v.id} className="viewer-item">
-                                <div className="viewer-avatar">{v.initials}</div>
+                                <div className="viewer-avatar">{getInitials(v.name)}</div>
                                 <span className="viewer-name">{v.name}</span>
                             </div>
                         ))}
@@ -137,6 +180,17 @@ export default function PresenceIndicator({ ticketId }: PresenceIndicatorProps) 
                     font-weight: 600;
                     text-transform: uppercase;
                     letter-spacing: 0.03em;
+                }
+
+                .live-icon {
+                    margin-left: auto;
+                    color: var(--success-500);
+                    animation: pulse 2s infinite;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
                 }
 
                 .viewer-list {

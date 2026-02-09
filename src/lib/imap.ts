@@ -1,7 +1,15 @@
 // @ts-nocheck - imap-simple lacks proper TypeScript declarations
 import imaps from 'imap-simple';
 import { simpleParser } from 'mailparser';
+import crypto from 'crypto';
 import prisma from './prisma';
+
+/**
+ * Generate a secure random password for email-created users
+ */
+function generateSecurePassword(): string {
+    return crypto.randomBytes(32).toString('base64');
+}
 
 export interface IMAPConfig {
     host: string;
@@ -102,11 +110,16 @@ export async function processEmailsToTickets(config: IMAPConfig, departmentId: n
             });
 
             if (requesterRole) {
+                // Generate secure random password - user must use password reset to login
+                const securePassword = generateSecurePassword();
+                const bcrypt = await import('bcryptjs');
+                const hashedPassword = await bcrypt.hash(securePassword, 12);
+
                 user = await prisma.user.create({
                     data: {
                         email: email.from,
                         name: email.fromName,
-                        password: '',
+                        passwordHash: hashedPassword,
                         roleId: requesterRole.id,
                     },
                 });

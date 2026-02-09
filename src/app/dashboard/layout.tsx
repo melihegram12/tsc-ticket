@@ -24,9 +24,11 @@ import {
   Package,
   FileSearch,
   Zap,
+  Mail,
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
 import NotificationCenter from '@/components/NotificationCenter';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface NavItem {
   label: string;
@@ -48,6 +50,7 @@ const adminItems: NavItem[] = [
   { label: 'Raporlar', href: '/dashboard/reports', icon: <BarChart3 size={20} />, permission: 'report.view' },
   { label: 'Kullanıcılar', href: '/dashboard/admin/users', icon: <Users size={20} />, permission: 'admin.users' },
   { label: 'Departmanlar', href: '/dashboard/admin/departments', icon: <Building2 size={20} />, permission: 'admin.departments' },
+  { label: 'E-posta Ayarları', href: '/dashboard/admin/email', icon: <Mail size={20} />, permission: 'admin.email' },
   { label: 'Otomasyon', href: '/dashboard/admin/automation', icon: <Zap size={20} />, permission: 'admin.automation' },
   { label: 'Denetim Logları', href: '/dashboard/admin/audit', icon: <FileSearch size={20} />, permission: 'admin.audit' },
   { label: 'Ayarlar', href: '/dashboard/admin/settings', icon: <Settings size={20} />, permission: 'admin.settings' },
@@ -217,6 +220,7 @@ export default function DashboardLayout({
           </div>
 
           <div className="header-right">
+            <ThemeToggle />
             <NotificationCenter />
 
             <div className="user-menu-wrapper">
@@ -275,14 +279,14 @@ export default function DashboardLayout({
         .dashboard-layout {
           display: flex;
           min-height: 100vh;
-          background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #fff1f2 100%);
+          background: #000;
         }
 
         .sidebar-overlay {
           display: none;
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.7);
           backdrop-filter: blur(4px);
           z-index: 40;
           animation: fadeIn 0.2s ease;
@@ -299,10 +303,8 @@ export default function DashboardLayout({
           position: fixed;
           left: 0;
           top: 0;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 255, 0.98) 100%);
-          backdrop-filter: blur(24px);
-          border-right: 1px solid rgba(99, 102, 241, 0.1);
-          box-shadow: 4px 0 32px rgba(99, 102, 241, 0.08);
+          background: #0a0a0a;
+          border-right: 1px solid #1a1a1a;
           display: flex;
           flex-direction: column;
           z-index: 50;
@@ -314,8 +316,7 @@ export default function DashboardLayout({
           align-items: center;
           justify-content: space-between;
           padding: 1.5rem 1.25rem;
-          border-bottom: 1px solid rgba(99, 102, 241, 0.08);
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+          border-bottom: 1px solid #1a1a1a;
         }
 
         .logo {
@@ -323,7 +324,7 @@ export default function DashboardLayout({
           align-items: center;
           gap: 0.875rem;
           text-decoration: none;
-          color: var(--gray-900);
+          color: #fff;
           transition: all 0.3s ease;
         }
 
@@ -337,22 +338,22 @@ export default function DashboardLayout({
           justify-content: center;
           width: 44px;
           height: 44px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
-          color: white;
+          background: linear-gradient(135deg, #06b6d4, #10b981);
+          color: #000;
           border-radius: 14px;
-          box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35), inset 0 1px 1px rgba(255,255,255,0.3);
+          box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo:hover .logo-icon {
           transform: rotate(-8deg) scale(1.08);
-          box-shadow: 0 12px 28px rgba(99, 102, 241, 0.45), inset 0 1px 1px rgba(255,255,255,0.3);
+          box-shadow: 0 12px 28px rgba(6, 182, 212, 0.45);
         }
 
         .logo-text {
           font-weight: 800;
           font-size: 1.25rem;
-          background: linear-gradient(135deg, #1e1b4b, #6366f1);
+          background: linear-gradient(90deg, #06b6d4, #10b981);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -362,8 +363,8 @@ export default function DashboardLayout({
         @supports not (-webkit-background-clip: text) {
           .logo-text {
             background: none;
-            -webkit-text-fill-color: #1e1b4b;
-            color: #1e1b4b;
+            -webkit-text-fill-color: #06b6d4;
+            color: #06b6d4;
           }
         }
 
@@ -371,7 +372,7 @@ export default function DashboardLayout({
           display: none;
           background: none;
           border: none;
-          color: var(--gray-500);
+          color: #525252;
           cursor: pointer;
           padding: 0.5rem;
         }
@@ -389,7 +390,7 @@ export default function DashboardLayout({
         .admin-section {
           margin-top: 1rem;
           padding-top: 1rem;
-          border-top: 1px solid rgba(99, 102, 241, 0.1);
+          border-top: 1px solid #1a1a1a;
         }
 
         .nav-section-title {
@@ -400,7 +401,7 @@ export default function DashboardLayout({
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          color: #6366f1;
+          color: #06b6d4;
           padding: 0.5rem 0.875rem;
           margin-bottom: 0.375rem;
         }
@@ -411,7 +412,7 @@ export default function DashboardLayout({
           gap: 0.875rem;
           padding: 0.875rem 1rem;
           border-radius: 12px;
-          color: #475569;
+          color: #737373;
           text-decoration: none;
           font-size: 0.9375rem;
           font-weight: 500;
@@ -439,50 +440,50 @@ export default function DashboardLayout({
           width: 36px;
           height: 36px;
           border-radius: 10px;
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-          color: #6366f1;
+          background: rgba(6, 182, 212, 0.1);
+          color: #06b6d4;
           transition: all 0.25s ease;
         }
 
         .nav-icon.admin-icon {
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(234, 88, 12, 0.1) 100%);
+          background: rgba(245, 158, 11, 0.1);
           color: #f59e0b;
         }
 
         .nav-item:hover {
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
-          color: #4f46e5;
+          background: #1a1a1a;
+          color: #a3a3a3;
           transform: translateX(4px);
         }
 
         .nav-item:hover .nav-icon {
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+          background: rgba(6, 182, 212, 0.2);
           transform: scale(1.05);
         }
 
         .nav-item:hover .nav-icon.admin-icon {
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%);
+          background: rgba(245, 158, 11, 0.2);
         }
 
         .nav-item.active {
-          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-          color: white;
-          box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35), inset 0 1px 1px rgba(255,255,255,0.2);
+          background: linear-gradient(135deg, #06b6d4, #10b981);
+          color: #000;
+          box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
         }
 
         .nav-item.active .nav-icon {
-          background: rgba(255, 255, 255, 0.2);
-          color: white;
+          background: rgba(0, 0, 0, 0.2);
+          color: #000;
         }
 
         .nav-item.active .nav-icon.admin-icon {
-          background: rgba(255, 255, 255, 0.2);
-          color: white;
+          background: rgba(0, 0, 0, 0.2);
+          color: #000;
         }
 
         .nav-item.active:hover {
           transform: translateX(4px);
-          box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45), inset 0 1px 1px rgba(255,255,255,0.2);
+          box-shadow: 0 10px 28px rgba(6, 182, 212, 0.45);
         }
 
         .active-indicator {
@@ -490,7 +491,7 @@ export default function DashboardLayout({
           right: 12px;
           width: 6px;
           height: 6px;
-          background: white;
+          background: #000;
           border-radius: 50%;
           animation: pulse 2s ease-in-out infinite;
         }
@@ -502,8 +503,7 @@ export default function DashboardLayout({
 
         .sidebar-footer {
           padding: 1.25rem;
-          border-top: 1px solid rgba(99, 102, 241, 0.1);
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+          border-top: 1px solid #1a1a1a;
         }
 
         .user-info {
@@ -520,12 +520,12 @@ export default function DashboardLayout({
         .user-name {
           font-weight: 500;
           font-size: 0.875rem;
-          color: var(--gray-900);
+          color: #fff;
         }
 
         .user-role {
           font-size: 0.75rem;
-          color: var(--gray-500);
+          color: #525252;
         }
 
         .main-wrapper {
@@ -537,8 +537,8 @@ export default function DashboardLayout({
 
         .header {
           height: var(--header-height);
-          background: white;
-          border-bottom: 1px solid var(--gray-200);
+          background: #0a0a0a;
+          border-bottom: 1px solid #1a1a1a;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -558,7 +558,7 @@ export default function DashboardLayout({
           display: none;
           background: none;
           border: none;
-          color: var(--gray-600);
+          color: #525252;
           cursor: pointer;
           padding: 0.5rem;
         }
@@ -573,15 +573,15 @@ export default function DashboardLayout({
           position: relative;
           background: none;
           border: none;
-          color: var(--gray-500);
+          color: #525252;
           cursor: pointer;
           padding: 0.5rem;
           border-radius: 0.375rem;
         }
 
         .header-btn:hover {
-          background: var(--gray-100);
-          color: var(--gray-700);
+          background: #1a1a1a;
+          color: #fff;
         }
 
         .notification-badge {
@@ -609,15 +609,16 @@ export default function DashboardLayout({
           align-items: center;
           gap: 0.5rem;
           background: none;
-          border: 1px solid var(--gray-200);
+          border: 1px solid #262626;
           border-radius: 0.5rem;
           padding: 0.375rem 0.75rem;
           cursor: pointer;
-          color: var(--gray-700);
+          color: #a3a3a3;
         }
 
         .user-menu-btn:hover {
-          background: var(--gray-50);
+          background: #1a1a1a;
+          color: #fff;
         }
 
         .user-menu-name {
@@ -636,8 +637,8 @@ export default function DashboardLayout({
           top: calc(100% + 0.5rem);
           right: 0;
           width: 240px;
-          background: white;
-          border: 1px solid var(--gray-200);
+          background: #0a0a0a;
+          border: 1px solid #262626;
           border-radius: 0.5rem;
           box-shadow: var(--shadow-lg);
           z-index: 50;
@@ -646,20 +647,20 @@ export default function DashboardLayout({
 
         .user-menu-header {
           padding: 1rem;
-          background: var(--gray-50);
-          border-bottom: 1px solid var(--gray-200);
+          background: #111;
+          border-bottom: 1px solid #262626;
           display: flex;
           flex-direction: column;
         }
 
         .user-menu-header strong {
           font-size: 0.875rem;
-          color: var(--gray-900);
+          color: #fff;
         }
 
         .user-menu-header span {
           font-size: 0.75rem;
-          color: var(--gray-500);
+          color: #525252;
         }
 
         .user-menu-items {
@@ -674,7 +675,7 @@ export default function DashboardLayout({
           padding: 0.625rem 0.75rem;
           border-radius: 0.375rem;
           font-size: 0.875rem;
-          color: var(--gray-700);
+          color: #a3a3a3;
           text-decoration: none;
           background: none;
           border: none;
@@ -683,15 +684,16 @@ export default function DashboardLayout({
         }
 
         .user-menu-item:hover {
-          background: var(--gray-100);
+          background: #1a1a1a;
+          color: #fff;
         }
 
         .user-menu-item.logout {
-          color: var(--danger-600);
+          color: #f87171;
         }
 
         .user-menu-item.logout:hover {
-          background: var(--danger-50);
+          background: rgba(239, 68, 68, 0.1);
         }
 
         .main-content {

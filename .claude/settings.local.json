@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm run electron:build)",
+      "Bash(npm run build:electron:*)",
+      "Bash(npm run)",
+      "Bash(npx electron-builder --win --x64)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run dev)",
+      "Bash(docker run -d --name tsc-postgres -e POSTGRES_USER=tsc_admin -e POSTGRES_PASSWORD=tsc_secure_password_2026 -e POSTGRES_DB=tsc_ticket -p 5434:5432 postgres:15)",
+      "Bash(npx prisma db push:*)",
+      "Bash(ipconfig:*)"
+    ]
+  }
+}

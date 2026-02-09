@@ -39,11 +39,26 @@ export const getTicketViewers = () => ticketViewers;
 export const initSocketServer = (server: NetServer) => {
     if (io) return io;
 
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+        'http://localhost:3000',
+        'http://localhost:3001',
+    ];
+
     io = new SocketIOServer(server, {
-        path: '/api/socket',
+        path: '/socket.io',
         cors: {
-            origin: '*',
+            origin: (origin, callback) => {
+                // Allow requests with no origin (mobile apps, curl, etc.) in development
+                if (!origin && process.env.NODE_ENV !== 'production') {
+                    return callback(null, true);
+                }
+                if (origin && allowedOrigins.includes(origin)) {
+                    return callback(null, true);
+                }
+                callback(new Error('CORS not allowed'));
+            },
             methods: ['GET', 'POST'],
+            credentials: true,
         },
         transports: ['websocket', 'polling'],
     });

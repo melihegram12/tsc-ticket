@@ -276,12 +276,12 @@ export default function DashboardPage() {
         .page-header h1 {
           font-size: 1.5rem;
           font-weight: 700;
-          color: var(--gray-900);
+          color: #fff;
           margin: 0 0 0.25rem 0;
         }
 
         .page-header p {
-          color: var(--gray-500);
+          color: #525252;
           margin: 0;
         }
 
@@ -293,14 +293,14 @@ export default function DashboardPage() {
         }
 
         .stat-card {
-          background: white;
+          background: #0a0a0a;
           border-radius: 16px;
           padding: 1.5rem;
           display: flex;
           align-items: center;
           gap: 1rem;
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+          border: 1px solid #1a1a1a;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
@@ -313,14 +313,14 @@ export default function DashboardPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: linear-gradient(90deg, var(--primary-400), var(--primary-600));
+          background: linear-gradient(90deg, #06b6d4, #10b981);
           opacity: 0;
           transition: opacity 0.3s ease;
         }
 
         .stat-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 12px 32px rgba(6, 182, 212, 0.15);
         }
 
         .stat-card:hover::before {
@@ -342,26 +342,26 @@ export default function DashboardPage() {
         }
 
         .stat-icon.open {
-          background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
-          color: var(--primary-600);
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+          background: rgba(6, 182, 212, 0.15);
+          color: #06b6d4;
+          box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
         }
 
         .stat-icon.pending {
-          background: linear-gradient(135deg, #fef3c7, #fde68a);
-          color: var(--warning-600);
+          background: rgba(245, 158, 11, 0.15);
+          color: #f59e0b;
           box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
 
         .stat-icon.resolved {
-          background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-          color: var(--success-600);
+          background: rgba(34, 197, 94, 0.15);
+          color: #22c55e;
           box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
         }
 
         .stat-icon.sla {
-          background: linear-gradient(135deg, #fee2e2, #fecaca);
-          color: var(--danger-600);
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
           box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
 
@@ -373,7 +373,7 @@ export default function DashboardPage() {
         .stat-value {
           font-size: 2rem;
           font-weight: 800;
-          color: var(--gray-900);
+          color: #fff;
           line-height: 1;
           animation: countIn 0.5s ease-out;
         }
@@ -391,7 +391,7 @@ export default function DashboardPage() {
 
         .stat-label {
           font-size: 0.875rem;
-          color: var(--gray-500);
+          color: #525252;
           margin-top: 0.375rem;
           font-weight: 500;
         }
@@ -408,7 +408,7 @@ export default function DashboardPage() {
           gap: 0.5rem;
           font-size: 1rem;
           font-weight: 600;
-          color: var(--gray-900);
+          color: #fff;
           margin: 0;
         }
 
@@ -417,7 +417,7 @@ export default function DashboardPage() {
           align-items: center;
           gap: 0.25rem;
           font-size: 0.875rem;
-          color: var(--primary-600);
+          color: #06b6d4;
           text-decoration: none;
           font-weight: 500;
         }
@@ -432,18 +432,18 @@ export default function DashboardPage() {
           align-items: center;
           justify-content: center;
           padding: 3rem;
-          color: var(--gray-400);
+          color: #525252;
         }
 
         .empty-state p {
           margin: 1rem 0;
-          color: var(--gray-500);
+          color: #737373;
         }
 
         .ticket-number {
           font-family: monospace;
           font-size: 0.8125rem;
-          color: var(--primary-600);
+          color: #06b6d4;
           text-decoration: none;
           font-weight: 500;
         }
@@ -453,16 +453,16 @@ export default function DashboardPage() {
         }
 
         .ticket-subject {
-          color: var(--gray-900);
+          color: #fff;
           text-decoration: none;
         }
 
         .ticket-subject:hover {
-          color: var(--primary-600);
+          color: #06b6d4;
         }
 
         .date-cell {
-          color: var(--gray-500);
+          color: #525252;
           font-size: 0.8125rem;
           white-space: nowrap;
         }

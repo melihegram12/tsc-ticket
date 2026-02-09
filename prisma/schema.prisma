@@ -160,23 +160,42 @@ model Category {
 }
 
 // =============================================
-// TICKETS (String fields instead of enums for SQLite)
+// TICKETS
 // =============================================
 
-// TicketStatus: NEW, OPEN, WAITING_REQUESTER, PENDING, RESOLVED, CLOSED, REOPENED
-// TicketPriority: LOW, NORMAL, HIGH, URGENT
-// TicketSource: WEB, EMAIL, API
+enum TicketStatus {
+  NEW
+  OPEN
+  WAITING_REQUESTER
+  PENDING
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketSource {
+  WEB
+  EMAIL
+  API
+}
 
 model Ticket {
-  id            Int     @id @default(autoincrement())
-  ticketNumber  String  @unique @map("ticket_number")
-  requesterName String? @map("requester_name") // Name entered by requester when creating ticket
+  id            Int            @id @default(autoincrement())
+  ticketNumber  String         @unique @map("ticket_number")
+  requesterName String?        @map("requester_name")
   subject       String
   description   String
-  status        String  @default("NEW") // NEW, OPEN, WAITING_REQUESTER, PENDING, RESOLVED, CLOSED, REOPENED
-  priority      String  @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
-  source        String  @default("WEB") // WEB, EMAIL, API
-  isPrivate     Boolean @default(false) @map("is_private")
+  status        TicketStatus   @default(NEW)
+  priority      TicketPriority @default(NORMAL)
+  source        TicketSource   @default(WEB)
+  isPrivate     Boolean        @default(false) @map("is_private")
 
   // Timestamps
   lastActivityAt  DateTime  @default(now()) @map("last_activity_at")
@@ -219,13 +238,17 @@ model Ticket {
   @@map("tickets")
 }
 
-// MessageType: PUBLIC_REPLY, INTERNAL_NOTE, SYSTEM
+enum MessageType {
+  PUBLIC_REPLY
+  INTERNAL_NOTE
+  SYSTEM
+}
 
 model TicketMessage {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   body        String
-  messageType String   @default("PUBLIC_REPLY") @map("message_type") // PUBLIC_REPLY, INTERNAL_NOTE, SYSTEM
-  createdAt   DateTime @default(now()) @map("created_at")
+  messageType MessageType @default(PUBLIC_REPLY) @map("message_type")
+  createdAt   DateTime    @default(now()) @map("created_at")
 
   // Relations
   ticketId Int    @map("ticket_id")
@@ -262,17 +285,30 @@ model TicketAttachment {
   @@map("ticket_attachments")
 }
 
-// EventType: CREATED, STATUS_CHANGED, PRIORITY_CHANGED, ASSIGNED, UNASSIGNED, 
-//            CATEGORY_CHANGED, DEPARTMENT_CHANGED, TAG_ADDED, TAG_REMOVED,
-//            MESSAGE_ADDED, ATTACHMENT_ADDED, SLA_BREACHED, REOPENED, MERGED
+enum EventType {
+  CREATED
+  STATUS_CHANGED
+  PRIORITY_CHANGED
+  ASSIGNED
+  UNASSIGNED
+  CATEGORY_CHANGED
+  DEPARTMENT_CHANGED
+  TAG_ADDED
+  TAG_REMOVED
+  MESSAGE_ADDED
+  ATTACHMENT_ADDED
+  SLA_BREACHED
+  REOPENED
+  MERGED
+}
 
 model TicketEvent {
-  id        Int      @id @default(autoincrement())
-  eventType String   @map("event_type") // See comment above for values
-  oldValue  String?  @map("old_value")
-  newValue  String?  @map("new_value")
-  metadata  String?
-  createdAt DateTime @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  eventType EventType @map("event_type")
+  oldValue  String?   @map("old_value")
+  newValue  String?   @map("new_value")
+  metadata  Json?
+  createdAt DateTime  @default(now()) @map("created_at")
 
   // Relations
   ticketId Int    @map("ticket_id")
@@ -314,13 +350,13 @@ model TicketTag {
 // =============================================
 
 model SLAPolicy {
-  id                   Int      @id @default(autoincrement())
+  id                   Int            @id @default(autoincrement())
   name                 String
-  priority             String // LOW, NORMAL, HIGH, URGENT
-  firstResponseMinutes Int      @map("first_response_minutes")
-  resolutionMinutes    Int      @map("resolution_minutes")
-  isActive             Boolean  @default(true) @map("is_active")
-  createdAt            DateTime @default(now()) @map("created_at")
+  priority             TicketPriority
+  firstResponseMinutes Int            @map("first_response_minutes")
+  resolutionMinutes    Int            @map("resolution_minutes")
+  isActive             Boolean        @default(true) @map("is_active")
+  createdAt            DateTime       @default(now()) @map("created_at")
 
   // Relations
   departmentId Int        @map("department_id")
@@ -350,8 +386,8 @@ model AutomationRule {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  conditions  String // JSON
-  actions     String // JSON
+  conditions  Json
+  actions     Json
   isActive    Boolean  @default(true) @map("is_active")
   priority    Int      @default(0)
   createdAt   DateTime @default(now()) @map("created_at")
@@ -430,14 +466,18 @@ model CannedResponse {
 // LIVE CHAT
 // =============================================
 
-// ChatStatus: WAITING, ACTIVE, CLOSED
+enum ChatStatus {
+  WAITING
+  ACTIVE
+  CLOSED
+}
 
 model ChatSession {
-  id        Int       @id @default(autoincrement())
-  status    String    @default("WAITING") // WAITING, ACTIVE, CLOSED
+  id        Int        @id @default(autoincrement())
+  status    ChatStatus @default(WAITING)
   subject   String?
-  startedAt DateTime  @default(now()) @map("started_at")
-  endedAt   DateTime? @map("ended_at")
+  startedAt DateTime   @default(now()) @map("started_at")
+  endedAt   DateTime?  @map("ended_at")
 
   // Relations
   customerId Int  @map("customer_id")
@@ -473,17 +513,24 @@ model ChatMessage {
 // NOTIFICATIONS
 // =============================================
 
-// NotificationType: TICKET_CREATED, TICKET_ASSIGNED, TICKET_UPDATED, 
-//                   TICKET_REPLIED, SLA_WARNING, SLA_BREACH, CHAT_MESSAGE
+enum NotificationType {
+  TICKET_CREATED
+  TICKET_ASSIGNED
+  TICKET_UPDATED
+  TICKET_REPLIED
+  SLA_WARNING
+  SLA_BREACH
+  CHAT_MESSAGE
+}
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  type      String // See comment above for values
+  id        Int              @id @default(autoincrement())
+  type      NotificationType
   title     String
   message   String
-  isRead    Boolean  @default(false) @map("is_read")
-  data      String? // JSON metadata
-  createdAt DateTime @default(now()) @map("created_at")
+  isRead    Boolean          @default(false) @map("is_read")
+  data      Json?
+  createdAt DateTime         @default(now()) @map("created_at")
 
   // Relations
   userId Int  @map("user_id")
@@ -541,7 +588,7 @@ model SystemSetting {
 model SavedSearch {
   id        Int      @id @default(autoincrement())
   name      String
-  filters   String // JSON: { status: [], priority: [], departmentId: ..., search: ... }
+  filters   Json
   isDefault Boolean  @default(false) @map("is_default")
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -556,9 +603,9 @@ model SavedSearch {
 // =============================================
 
 model UserDashboardConfig {
-  id      Int     @id @default(autoincrement())
-  widgets String // JSON array: ["stats", "recent", "sla", "performance"]
-  layout  String? // JSON: grid layout configuration
+  id      Int   @id @default(autoincrement())
+  widgets Json
+  layout  Json?
 
   userId Int  @unique @map("user_id")
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -572,11 +619,11 @@ model UserDashboardConfig {
 
 model AuditLog {
   id        Int      @id @default(autoincrement())
-  action    String // LOGIN, LOGOUT, TICKET_CREATE, TICKET_UPDATE, USER_CREATE, etc.
-  entity    String // ticket, user, department, settings
+  action    String
+  entity    String
   entityId  Int?     @map("entity_id")
-  oldValue  String?  @map("old_value") // JSON
-  newValue  String?  @map("new_value") // JSON
+  oldValue  Json?    @map("old_value")
+  newValue  Json?    @map("new_value")
   ipAddress String?  @map("ip_address")
   userAgent String?  @map("user_agent")
   createdAt DateTime @default(now()) @map("created_at")
@@ -600,9 +647,9 @@ model AssetModel {
   name         String
   description  String?
   manufacturer String?
-  category     String // Laptop, Phone, Software, Monitor, etc.
+  category     String
   image        String?
-  specs        String? // JSON specs
+  specs        Json?
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -613,9 +660,9 @@ model AssetModel {
 
 model Asset {
   id           Int       @id @default(autoincrement())
-  assetTag     String    @unique @map("asset_tag") // Company Tag
+  assetTag     String    @unique @map("asset_tag")
   serialNumber String?   @map("serial_number")
-  status       String    @default("STOCK") // STOCK, ASSIGNED, MAINTENANCE, RETIRED, LOST
+  status       String    @default("STOCK")
   purchaseDate DateTime? @map("purchase_date")
   warrantyEnd  DateTime? @map("warranty_end")
   notes        String?
@@ -667,6 +714,3 @@ model TicketAsset {
   @@id([ticketId, assetId])
   @@map("ticket_assets")
 }
-
-// AutomationRule model removed temporarily due to Prisma environment issue
-// Will be added when issue is resolved

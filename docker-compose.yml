@@ -1,0 +1,58 @@
+# TSC - Ticket Support Center
+# Docker Compose Configuration for Local Network Deployment
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  tsc-db:
+    image: postgres:16-alpine
+    container_name: tsc-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tsc_ticket
+      POSTGRES_USER: tsc_admin
+      POSTGRES_PASSWORD: tsc_secure_password_2026
+    volumes:
+      - tsc_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - tsc-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U tsc_admin -d tsc_ticket" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  tsc-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tsc-application
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://tsc_admin:tsc_secure_password_2026@tsc-db:5432/tsc_ticket
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: your-super-secret-key-change-this-in-production-32chars
+    depends_on:
+      tsc-db:
+        condition: service_healthy
+    networks:
+      - tsc-network
+    volumes:
+      - tsc_uploads:/app/uploads
+
+volumes:
+  tsc_postgres_data:
+    name: tsc-postgres-data
+  tsc_uploads:
+    name: tsc-uploads
+
+networks:
+  tsc-network:
+    name: tsc-internal-network
+    driver: bridge
