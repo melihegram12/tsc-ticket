@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -163,38 +163,15 @@ model Category {
 // TICKETS
 // =============================================
 
-enum TicketStatus {
-  NEW
-  OPEN
-  WAITING_REQUESTER
-  PENDING
-  RESOLVED
-  CLOSED
-  REOPENED
-}
-
-enum TicketPriority {
-  LOW
-  NORMAL
-  HIGH
-  URGENT
-}
-
-enum TicketSource {
-  WEB
-  EMAIL
-  API
-}
-
 model Ticket {
   id            Int            @id @default(autoincrement())
   ticketNumber  String         @unique @map("ticket_number")
   requesterName String?        @map("requester_name")
   subject       String
   description   String
-  status        TicketStatus   @default(NEW)
-  priority      TicketPriority @default(NORMAL)
-  source        TicketSource   @default(WEB)
+  status        String         @default("NEW") // Enum: NEW, OPEN, WAITING_REQUESTER, PENDING, RESOLVED, CLOSED, REOPENED
+  priority      String         @default("NORMAL") // Enum: LOW, NORMAL, HIGH, URGENT
+  source        String         @default("WEB") // Enum: WEB, EMAIL, API
   isPrivate     Boolean        @default(false) @map("is_private")
 
   // Timestamps
@@ -238,16 +215,10 @@ model Ticket {
   @@map("tickets")
 }
 
-enum MessageType {
-  PUBLIC_REPLY
-  INTERNAL_NOTE
-  SYSTEM
-}
-
 model TicketMessage {
   id          Int         @id @default(autoincrement())
   body        String
-  messageType MessageType @default(PUBLIC_REPLY) @map("message_type")
+  messageType String      @default("PUBLIC_REPLY") @map("message_type") // Enum: PUBLIC_REPLY, INTERNAL_NOTE, SYSTEM
   createdAt   DateTime    @default(now()) @map("created_at")
 
   // Relations
@@ -285,28 +256,9 @@ model TicketAttachment {
   @@map("ticket_attachments")
 }
 
-enum EventType {
-  CREATED
-  STATUS_CHANGED
-  PRIORITY_CHANGED
-  ASSIGNED
-  UNASSIGNED
-  CATEGORY_CHANGED
-  DEPARTMENT_CHANGED
-  TAG_ADDED
-  TAG_REMOVED
-  MESSAGE_ADDED
-  ATTACHMENT_ADDED
-  SLA_BREACHED
-  REOPENED
-  MERGED
-  AUTOMATION
-  SATISFACTION_RATED
-}
-
 model TicketEvent {
   id        Int       @id @default(autoincrement())
-  eventType EventType @map("event_type")
+  eventType String      @map("event_type") // Enum: CREATED, STATUS_CHANGED, etc.
   oldValue  String?   @map("old_value")
   newValue  String?   @map("new_value")
   metadata  Json?
@@ -354,7 +306,7 @@ model TicketTag {
 model SLAPolicy {
   id                   Int            @id @default(autoincrement())
   name                 String
-  priority             TicketPriority
+  priority             String         // Enum: LOW, NORMAL, HIGH, URGENT
   firstResponseMinutes Int            @map("first_response_minutes")
   resolutionMinutes    Int            @map("resolution_minutes")
   isActive             Boolean        @default(true) @map("is_active")
@@ -468,15 +420,9 @@ model CannedResponse {
 // LIVE CHAT
 // =============================================
 
-enum ChatStatus {
-  WAITING
-  ACTIVE
-  CLOSED
-}
-
 model ChatSession {
   id        Int        @id @default(autoincrement())
-  status    ChatStatus @default(WAITING)
+  status    String     @default("WAITING") // Enum: WAITING, ACTIVE, CLOSED
   subject   String?
   startedAt DateTime   @default(now()) @map("started_at")
   endedAt   DateTime?  @map("ended_at")
@@ -515,19 +461,9 @@ model ChatMessage {
 // NOTIFICATIONS
 // =============================================
 
-enum NotificationType {
-  TICKET_CREATED
-  TICKET_ASSIGNED
-  TICKET_UPDATED
-  TICKET_REPLIED
-  SLA_WARNING
-  SLA_BREACH
-  CHAT_MESSAGE
-}
-
 model Notification {
   id        Int              @id @default(autoincrement())
-  type      NotificationType
+  type      String           // Enum: TICKET_CREATED, etc.
   title     String
   message   String
   isRead    Boolean          @default(false) @map("is_read")
