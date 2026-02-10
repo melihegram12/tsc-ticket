@@ -1,4 +1,4 @@
-import { PrismaClient, TicketPriority } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -282,12 +282,12 @@ async function main() {
   for (const dept of [itDept, hrDept, financeDept, facilityDept, purchaseDept]) {
     for (const sla of slaConfig) {
       await prisma.sLAPolicy.upsert({
-        where: { departmentId_priority: { departmentId: dept.id, priority: sla.priority as TicketPriority } },
+        where: { departmentId_priority: { departmentId: dept.id, priority: sla.priority } },
         update: {},
         create: {
           name: `${dept.name} - ${sla.priority}`,
           departmentId: dept.id,
-          priority: sla.priority as TicketPriority,
+          priority: sla.priority,
           firstResponseMinutes: sla.firstResponse,
           resolutionMinutes: sla.resolution,
         },
