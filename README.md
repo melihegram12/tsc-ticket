@@ -15,61 +15,57 @@ Malhotra Helpdesk için dahili destek talep yönetim sistemi.
 
 ## 🛠 Teknolojiler
 
-- **Frontend:** Next.js 15 (App Router), React 19
-- **Backend:** Next.js API Routes
-- **Database:** PostgreSQL + Prisma ORM
+- **Frontend:** Next.js 16 (App Router), React 19
+- **Backend:** Next.js API Routes / Server Actions
+- **Database:** SQLite (Dev) / PostgreSQL (Prod) + Prisma ORM
 - **Auth:** NextAuth.js
-- **Styling:** CSS Modules
+- **Styling:** Tailwind CSS
 
-## 📋 Kurulum
+## 📋 Hızlı Kurulum (SQLite - Geliştirme Ortamı)
+
+Bu proje geliştirme ortamında **SQLite** kullanacak şekilde yapılandırılmıştır. Ekstra bir veritabanı kurulumuna ihtiyaç duymaz.
 
 ```bash
 # 1. Bağımlılıkları yükle
 npm install
 
-# 2. .env dosyası oluştur
-cp .env.example .env
+# 2. Veritabanını oluştur ve sıfırla (Temiz Başlangıç)
+npx prisma db push --force-reset
 
-# 3. Veritabanı şemasını uygula
-npx prisma db push
+# 3. Başlangıç verilerini (Admin, Roller, Departmanlar) yükle
+npx prisma db seed
 
-# 4. Seed verileri ekle
-npm run db:seed
-
-# 5. Geliştirme sunucusunu başlat
+# 4. Geliştirme sunucusunu başlat
 npm run dev
 ```
 
-## 🔐 Ortam Değişkenleri
+Uygulama: http://localhost:3000
 
-| Değişken | Açıklama |
-|----------|----------|
-| `DATABASE_URL` | PostgreSQL bağlantı adresi |
-| `NEXTAUTH_URL` | Uygulama URL'i |
-| `NEXTAUTH_SECRET` | NextAuth secret key |
+## 🔐 Ortam Değişkenleri (.env)
 
-## 👥 Varsayılan Kullanıcılar (Seed sonrası)
+| Değişken | Açıklama | Örnek Değer |
+|----------|----------|-------------|
+| `DATABASE_URL` | Veritabanı bağlantı adresi | `"file:./dev.db"` (SQLite için) |
+| `NEXTAUTH_URL` | Uygulama URL'i | `"http://localhost:3000"` |
+| `NEXTAUTH_SECRET` | Güvenlik anahtarı | (Rastgele string) |
 
-| E-posta | Şifre | Rol |
-|---------|-------|-----|
-| admin@tsc.local | admin123 | Admin |
-| it.agent@tsc.local | admin123 | IT Agent |
-| hr.agent@tsc.local | admin123 | HR Agent |
-| calisan@tsc.local | admin123 | Requester |
+## 👥 Varsayılan Kullanıcılar (Seed Data)
 
-## 📁 Proje Yapısı
+Veritabanı oluşturulduğunda aşağıdaki hesaplar otomatik tanımlanır:
 
-```
-src/
-├── app/
-│   ├── api/              # API endpoints
-│   ├── dashboard/        # Dashboard sayfaları
-│   └── auth/             # Login sayfası
-├── components/
-│   ├── widgets/          # Dashboard widget bileşenleri
-│   └── ...               # Diğer bileşenler
-└── lib/                  # Utility fonksiyonlar
-```
+| Rol | E-posta | Şifre |
+|-----|---------|-------|
+| **Admin** | `admin@tsc.local` | `admin123` |
+| **IT Agent** | `it.agent@tsc.local` | `admin123` |
+| **HR Agent** | `hr.agent@tsc.local` | `admin123` |
+| **Personel** | `calisan@tsc.local` | (Şifresiz Giriş) |
+
+## 📁 Önemli Dosyalar
+
+- `prisma/schema.prisma`: Veritabanı şeması (SQLite uyumlu)
+- `src/types/enums.ts`: Prisma Enum'larının yerel TypeScript tanımları
+- `TEST_PLAN.md`: Manuel test senaryoları
+- `DEV_NOTES.md`: Geliştirme notları ve değişiklik günlüğü
 
 ## 🚀 Deploy
 
